@@ -1,0 +1,138 @@
+# The production environment runs the live application for public use. Debugging outputs are minimized and
+# the application runs with stricter configurations.
+services:
+  # first instance of the api server
+  api1:
+    container_name: api-prod-1
+    build:
+      context: ..
+      dockerfile: ./docker/api/Dockerfile
+    env_file:
+      - ../config/env/.env.production
+    environment:
+      - PORT=3200
+      - NODE_ENV=production
+      - IS_PRIMARY=true
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - nginx-network-prod
+      - core-network-prod
+
+  # second instance of the api server
+  api2:
+    container_name: api-prod-2
+    build:
+      context: ..
+      dockerfile: ./docker/api/Dockerfile
+    env_file:
+      - ../config/env/.env.production
+    environment:
+      - PORT=3201
+      - NODE_ENV=production
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - nginx-network-prod
+      - core-network-prod
+
+  # runs scheduled jobs on the platform
+  jobs:
+    container_name: jobs-prod
+    build:
+      context: ..
+      dockerfile: ./docker/jobs/Dockerfile
+    env_file:
+      - ../config/env/.env.production
+    depends_on:
+      mysql:
+        condition: service_healthy
+      api1:
+        condition: service_started
+      api2:
+        condition: service_started
+    networks:
+      - core-network-prod
+
+  # used in user sessions and secure storage of user data/tokens
+  redis:
+    container_name: redis-prod
+    image: redis:latest
+    env_file:
+      - ../config/env/.env.production
+    networks:
+      - core-network-prod
+    volumes:
+      - redis-data-prod:/data
+    healthcheck:
+      test: "exit 0"
+
+  # used to persist user/themes data
+  mysql:
+    container_name: mysql-prod
+    image: mysql:latest
+    env_file:
+      - ../config/env/.env.production
+    networks:
+      - core-network-prod
+    volumes:
+      - mysql-data-prod:/var/lib/mysql
+    # todo: is this check good enough?
+    healthcheck:
+      test: "exit 0"
+
+  # used for temporarily holding uploaded theme files
+  minio:
+    container_name: minio-prod
+    image: minio/minio
+    env_file:
+      - ../config/env/.env.production
+    command: server /data
+    volumes:
+      - minio-data-prod:/data
+    networks:
+      - core-network-prod
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:9000/minio/health/live"
+        ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # used to load balance between api server instances
+  nginx:
+    image: nginx:latest
+    container_name: nginx-prod
+    ports:
+      - "3100:3100"
+    volumes:
+      - ../config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+    networks:
+      - nginx-network-prod
+
+# todo: redis seems to create ghost volumes on every restart even with data specified, why?
+volumes:
+  mysql-data-prod:
+  minio-data-prod:
+  redis-data-prod:
+
+
+networks:
+  nginx-network-prod:
+    driver: bridge
+  core-network-prod:
+    driver: bridge

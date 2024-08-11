@@ -1,0 +1,14 @@
+# system files
+.vscode
+.DS_Store
+
+# build files
+/dist
+/build
+
+# node modules
+/node_modules
+
+# env files
+/config/env/*
+!/config/env/.env.template

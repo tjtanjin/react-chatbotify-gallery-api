@@ -1,0 +1,20 @@
+# For development purposes, the dev docker file simply mounts the codebase with hot-reloading
+FROM node:20-alpine
+
+# Maintainer information
+LABEL org.opencontainers.image.authors="Tan Jin (tjtanjin)"
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json to the container
+COPY ./package.json ./
+
+# Install the application dependencies
+RUN npm install
+
+# Copy additional files needed for runtime
+COPY nodemon-jobs.json ./
+
+# Command to run the application with nodemon for development
+CMD ["npm", "run", "dev:watch-jobs"]

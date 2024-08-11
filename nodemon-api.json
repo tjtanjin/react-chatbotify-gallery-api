@@ -1,0 +1,12 @@
+{
+	"watch": [
+		"src",
+		"types",
+		"config"
+	],
+	"ext": "ts,js,json",
+	"ignore": [
+		"node_modules"
+	],
+	"exec": "ts-node ./src/api/index.ts"
+}

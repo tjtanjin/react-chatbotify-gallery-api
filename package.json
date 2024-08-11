@@ -1,0 +1,46 @@
+{
+  "name": "react-chatbotify-gallery-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express-session": "^1.18.0",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^22.1.0",
+    "@types/uuid": "^9.0.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "npx tsc --build",
+    "deploy-prod": "docker compose -p prod -f ./docker/docker-compose.yml down && docker compose -p prod -f ./docker/docker-compose.yml up --build -d",
+    "stop-prod": "docker compose -p prod -f ./docker/docker-compose.yml down",
+    "deploy-playground": "docker compose -p playground -f ./docker/docker-compose.playground.yml down && docker compose -p playground -f ./docker/docker-compose.playground.yml up --build -d",
+    "stop-playground": "docker compose -p playground -f ./docker/docker-compose.playground.yml down",
+    "dev": "docker compose -p dev -f ./docker/docker-compose.dev.yml down && docker compose -p dev -f ./docker/docker-compose.dev.yml up --build",
+    "dev:watch-api": "nodemon --config nodemon-api.json",
+    "dev:watch-jobs": "nodemon --config nodemon-jobs.json"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "axios": "^1.6.8",
+    "chromadb": "^1.8.1",
+    "connect-redis": "^7.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "minio": "^8.0.1",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.4",
+    "nodemon": "^3.1.0",
+    "openai": "^4.33.0",
+    "redis": "^4.6.13",
+    "request": "^2.88.2",
+    "sequelize": "^6.37.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^9.0.1"
+  }
+}
