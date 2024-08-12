@@ -86,6 +86,14 @@ const getUserData = async (sessionId: string, userId: string | null, provider: s
 					role: user.dataValues.role,
 					...userProviderData
 				}
+
+				// save user data to cache, expires every 15mins to update
+				await redisClient.set(
+					`${process.env.USER_DATA_PREFIX as string}:${sessionId}`,
+					JSON.stringify(userProviderData),
+					{ EX: 900 }
+				);
+
 				return userData;
 			}
 			return null;
@@ -152,10 +160,11 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 }
 
 /**
- *
+ * Saves user access token into cache and refresh token into mysql (both are encrypted).
  * 
  * @param sessionId id of the session
  * @param userId id of the user
+ * @param tokenResponse token response to retrieve token information from
  *
  * @returns true if successfully saved, false otherwise
  */
@@ -187,7 +196,7 @@ const saveUserTokens = async (sessionId: string, userId: string, tokenResponse: 
 //
 
 /**
- * Retrieves user session data from the provider.
+ * Retrieves user provider data from the provider.
  * 
  * @param sessionId id of the session
  * @param userId id of the user, can be null if first time logging in
@@ -215,16 +224,6 @@ const getUserProviderDataFromProvider = async (
 	let userProviderData = null;
 	if (provider === process.env.GITHUB_LOGIN_PROVIDER) {
 		userProviderData = await getGitHubUserData(accessToken);
-	}
-
-	try {
-		// save user data to cache, expires every 15mins to update
-		await redisClient.set(
-			`${process.env.USER_DATA_PREFIX as string}:${sessionId}`,
-			JSON.stringify(userProviderData),
-			{ EX: 900 }
-		);
-	} catch {
 	}
 
 	return userProviderData;

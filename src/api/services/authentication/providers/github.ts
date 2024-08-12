@@ -31,11 +31,12 @@ const getGitHubUserTokensWithCode = async (key: string) => {
 		}
 
 		// buffer 15 minutes from token expiry times, hence -900
+		// multiply expiry time by 1000 since it is given in seconds
 		const tokenResponse: TokenResponse = {
 			access_token: response.data.access_token,
-			access_token_expiry: Date.now() + response.data.expires_in - 900,
+			access_token_expiry: Date.now() + (response.data.expires_in * 1000) - 900,
 			refresh_token: response.data.refresh_token,
-			refresh_token_expiry: Date.now() + response.data.refresh_token_expires_in - 900
+			refresh_token_expiry: Date.now() + (response.data.refresh_token_expires_in * 1000) - 900
 		}
 		return tokenResponse;
 	} catch (error) {
@@ -69,11 +70,13 @@ const getGitHubUserTokensWithRefresh = async (refreshToken: string) => {
 			return null;
 		}
 
+		// buffer 15 minutes from token expiry times, hence -900
+		// multiply expiry time by 1000 since it is given in seconds
 		const tokenResponse: TokenResponse = {
 			access_token: response.data.access_token,
-			access_token_expiry: Date.now() + response.data.expires_in - 900,
+			access_token_expiry: Date.now() + (response.data.expires_in * 1000) - 900,
 			refresh_token: response.data.refresh_token,
-			refresh_token_expiry: Date.now() + response.data.refresh_token_expires_in - 900
+			refresh_token_expiry: Date.now() + (response.data.refresh_token_expires_in * 1000) - 900
 		}
 		return tokenResponse;
 	} catch (error) {
