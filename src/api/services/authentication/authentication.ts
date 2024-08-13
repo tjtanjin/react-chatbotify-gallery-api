@@ -1,7 +1,7 @@
 import { decrypt, encrypt } from "../cryptoService";
 
 import { Op } from "sequelize";
-import { redisClient } from "../../databases/redis";
+import { redisEphemeralClient } from "../../databases/redis";
 import LinkedAuthProvider from "../../databases/sql/models/LinkedAuthProvider";
 import User from "../../databases/sql/models/User";
 import UserRefreshToken from "../../databases/sql/models/UserRefreshToken";
@@ -32,7 +32,7 @@ const fetchTokensWithCode = async (sessionId: string, key: string, provider: str
 
 	try {
 		// save access token to Redis
-		await redisClient.set(
+		await redisEphemeralClient.set(
 			`${process.env.USER_TOKEN_PREFIX as string}:${sessionId}`,
 			encrypt(tokenResponse.access_token),
 			{ EX: 27900 }
@@ -55,7 +55,7 @@ const fetchTokensWithCode = async (sessionId: string, key: string, provider: str
 const getUserData = async (sessionId: string, userId: string | null, provider: string): Promise<UserData | null> => {
 	// if user data is still in cache, parse and return
 	try {
-		const cachedUserData = await redisClient.get(`${process.env.USER_DATA_PREFIX}:${sessionId}`);
+		const cachedUserData = await redisEphemeralClient.get(`${process.env.USER_DATA_PREFIX}:${sessionId}`);
 		if (cachedUserData) {
 			return JSON.parse(cachedUserData as string);
 		}
@@ -70,33 +70,30 @@ const getUserData = async (sessionId: string, userId: string | null, provider: s
 
 	// if user data not in cache, then try to fetch data from the provider with access token
 	try {
-		const encryptedToken = await redisClient.get(`${process.env.USER_TOKEN_PREFIX as string}:${sessionId}`);
-		if (encryptedToken) {
-			const accessToken = decrypt(encryptedToken);
-			const userProviderData = await getUserProviderDataFromProvider(sessionId, userId, accessToken, provider);
-			if (userProviderData) {
-				// get user data, will create user if user does not exist
-				const user = await getOrCreateUser(userProviderData);
-				if (!user) {
-					return null;
-				}
-
-				const userData: UserData = {
-					id: user.dataValues.id,
-					role: user.dataValues.role,
-					...userProviderData
-				}
-
-				// save user data to cache, expires every 15mins to update
-				await redisClient.set(
-					`${process.env.USER_DATA_PREFIX as string}:${sessionId}`,
-					JSON.stringify(userProviderData),
-					{ EX: 900 }
-				);
-
-				return userData;
+		const encryptedToken = await redisEphemeralClient.get(`${process.env.USER_TOKEN_PREFIX as string}:${sessionId}`);
+		const accessToken = encryptedToken ? decrypt(encryptedToken) : null;
+		const userProviderData = await getUserProviderDataFromProvider(sessionId, userId, accessToken, provider);
+		if (userProviderData) {
+			// get user data, will create user if user does not exist
+			const user = await getOrCreateUser(userProviderData);
+			if (!user) {
+				return null;
 			}
-			return null;
+
+			const userData: UserData = {
+				id: user.dataValues.id,
+				role: user.dataValues.role,
+				...userProviderData
+			}
+
+			// save user data to cache, expires every 15mins to update
+			await redisEphemeralClient.set(
+				`${process.env.USER_DATA_PREFIX as string}:${sessionId}`,
+				JSON.stringify(userProviderData),
+				{ EX: 900 }
+			);
+
+			return userData;
 		}
 		return null;
 	} catch {
@@ -171,7 +168,7 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 const saveUserTokens = async (sessionId: string, userId: string, tokenResponse: TokenResponse): Promise<boolean> => {
 	try {
 		// save access token to Redis
-		await redisClient.set(
+		await redisEphemeralClient.set(
 			`${process.env.USER_TOKEN_PREFIX as string}:${sessionId}`,
 			encrypt(tokenResponse.access_token),
 			{ EX: 27900 }
