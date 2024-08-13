@@ -70,6 +70,8 @@ services:
       - core-network-prod
     volumes:
       - redis-data-prod:/data
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
     healthcheck:
       test: "exit 0"
 
