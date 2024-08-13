@@ -1,11 +1,10 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import express, { Request } from "express";
+import express from "express";
 import session from "express-session";
-import { v4 as uuidv4 } from "uuid";
 
-import { redisStore } from "./databases/redis";
+import { redisSessionStore } from "./databases/redis";
 import { initializeDatabase as initializeSqlDatabase } from "./databases/sql/sql";
 import authRoutes from "./routes/authRoutes";
 import themeRoutes from "./routes/themeRoutes";
@@ -39,13 +38,8 @@ app.use(bodyParser.json());
 app.set("trust proxy", true);
 
 // handles user session
-const generateSessionKey = (req: Request) => {
-	const uuid = uuidv4();
-	// generate session key with prefix as the redis cache is shared
-	return `session:${uuid}`;
-};
 app.use(session({
-	store: redisStore,
+	store: redisSessionStore,
 	secret: process.env.SESSION_SECRET as string,
 	resave: false,
 	saveUninitialized: true,
@@ -58,7 +52,6 @@ app.use(session({
 		// if not in production, leave domain as undefined
 		domain: process.env.NODE_ENV === "production" ? process.env.FRONTEND_WEBSITE_DOMAIN : undefined
 	},
-	genid: generateSessionKey,
 }));
 
 // handle routes

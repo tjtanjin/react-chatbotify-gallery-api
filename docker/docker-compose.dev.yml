@@ -15,7 +15,9 @@ services:
       - NODE_ENV=development
       - IS_PRIMARY=true
     depends_on:
-      redis:
+      redis-sessions:
+        condition: service_healthy
+      redis-ephemeral:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -41,7 +43,9 @@ services:
       - PORT=3201
       - NODE_ENV=development
     depends_on:
-      redis:
+      redis-sessions:
+        condition: service_healthy
+      redis-ephemeral:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -78,17 +82,27 @@ services:
       - /app/node_modules
 
   # used in user sessions and secure storage of user data/tokens
-  redis:
-    container_name: redis-dev
+  redis-sessions:
+    container_name: redis-sessions-dev
     image: redis:latest
     env_file:
       - ../config/env/.env.development
     networks:
       - core-network-dev
     volumes:
-      - redis-data-dev:/data
-      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-sessions-data-dev:/data
+      - ./config/redis/redis.dev.conf:/usr/local/etc/redis/redis.conf:ro
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    healthcheck:
+      test: "exit 0"
+
+  redis-ephemeral:
+    container_name: redis-ephemeral-dev
+    image: redis:latest
+    env_file:
+      - ../config/env/.env.development
+    networks:
+      - core-network-dev
     healthcheck:
       test: "exit 0"
 
@@ -146,7 +160,7 @@ services:
 volumes:
   mysql-data-dev:
   minio-data-dev:
-  redis-data-dev:
+  redis-sessions-data-dev:
 
 
 networks:

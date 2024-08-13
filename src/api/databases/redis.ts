@@ -1,24 +1,31 @@
-import RedisStore from "connect-redis"
-import { createClient } from "redis"
+import RedisStore from "connect-redis";
+import { createClient } from "redis";
 
-// initialize redis client
-const redisClient = createClient({
+// initialize redis session client
+const redisSessionClient = createClient({
 	socket: {
-		host: "redis",
+		host: "redis-sessions",
 		port: 6379,
 		// todo: protect with passphrase?
-		// passphrase: process.env.REDIS_PASSWORD
 	}
 })
-redisClient.connect().catch(console.error)
+redisSessionClient.connect().catch(console.error)
 
-// initislize redis store
-const redisStore = new RedisStore({
-	client: redisClient,
-	prefix: "redis:",
-})
+const redisSessionStore = new RedisStore({
+	client: redisSessionClient,
+});
+
+// initialize redis ephemeral client
+const redisEphemeralClient = createClient({
+	socket: {
+		host: "redis-ephemeral",
+		port: 6379,
+		// todo: protect with passphrase?
+	}
+});
+redisEphemeralClient.connect().catch(console.error);
 
 export {
-	redisClient,
-	redisStore
-}
+	redisEphemeralClient,
+	redisSessionStore
+};

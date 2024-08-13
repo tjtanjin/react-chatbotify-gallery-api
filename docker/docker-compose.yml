@@ -14,7 +14,9 @@ services:
       - NODE_ENV=production
       - IS_PRIMARY=true
     depends_on:
-      redis:
+      redis-sessions:
+        condition: service_healthy
+      redis-ephemeral:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -34,7 +36,9 @@ services:
       - PORT=3201
       - NODE_ENV=production
     depends_on:
-      redis:
+      redis-sessions:
+        condition: service_healthy
+      redis-ephemeral:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -61,17 +65,27 @@ services:
       - core-network-prod
 
   # used in user sessions and secure storage of user data/tokens
-  redis:
-    container_name: redis-prod
+  redis-sessions:
+    container_name: redis-sessions-prod
     image: redis:latest
     env_file:
       - ../config/env/.env.production
     networks:
       - core-network-prod
     volumes:
-      - redis-data-prod:/data
+      - redis-sessions-data-prod:/data
       - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    healthcheck:
+      test: "exit 0"
+
+  redis-ephemeral:
+    container_name: redis-ephemeral-prod
+    image: redis:latest
+    env_file:
+      - ../config/env/.env.production
+    networks:
+      - core-network-prod
     healthcheck:
       test: "exit 0"
 
@@ -130,7 +144,7 @@ services:
 volumes:
   mysql-data-prod:
   minio-data-prod:
-  redis-data-prod:
+  redis-sessions-data-prod:
 
 
 networks:

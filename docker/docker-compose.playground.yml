@@ -15,7 +15,9 @@ services:
       - NODE_ENV=playground
       - IS_PRIMARY=true
     depends_on:
-      redis:
+      redis-sessions:
+        condition: service_healthy
+      redis-ephemeral:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -35,7 +37,9 @@ services:
       - PORT=3201
       - NODE_ENV=playground
     depends_on:
-      redis:
+      redis-sessions:
+        condition: service_healthy
+      redis-ephemeral:
         condition: service_healthy
       mysql:
         condition: service_healthy
@@ -62,17 +66,27 @@ services:
       - core-network-playground
 
   # used in user sessions and secure storage of user data/tokens
-  redis:
-    container_name: redis-playground
+  redis-sessions:
+    container_name: redis-sessions-playground
     image: redis:latest
     env_file:
       - ../config/env/.env.playground
     networks:
       - core-network-playground
     volumes:
-      - redis-data-playground:/data
-      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-sessions-data-playground:/data
+      - ./config/redis/redis.playground.conf:/usr/local/etc/redis/redis.conf:ro
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    healthcheck:
+      test: "exit 0"
+
+  redis-ephemeral:
+    container_name: redis-ephemeral-playground
+    image: redis:latest
+    env_file:
+      - ../config/env/.env.playground
+    networks:
+      - core-network-playground
     healthcheck:
       test: "exit 0"
 
@@ -131,7 +145,7 @@ services:
 volumes:
   mysql-data-playground:
   minio-data-playground:
-  redis-data-playground:
+  redis-sessions-data-playground:
 
 
 networks:
