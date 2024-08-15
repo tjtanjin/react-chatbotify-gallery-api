@@ -14,7 +14,7 @@ const checkUserSession = async (req: Request, res: Response, next: NextFunction)
 	const userData = await getUserData(req.sessionID, req.session.userId || null, req.session.provider as string);
 
 	if (!userData) {
-		return res.status(403).json({ error: "User session not found" });
+		return res.status(401).json({ error: "User session not found" });
 	}
 
 	req.userData = userData;

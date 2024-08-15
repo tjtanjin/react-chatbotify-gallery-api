@@ -8,7 +8,7 @@ import UserRefreshToken from "../../databases/sql/models/UserRefreshToken";
 import { TokenResponse } from "../../interfaces/TokenResponse";
 import { UserData } from "../../interfaces/UserData";
 import { UserProviderData } from "../../interfaces/UserProviderData";
-import { getGitHubUserData, getGitHubUserTokensWithCode, getGitHubUserTokensWithRefresh } from "./providers/github";
+import * as GitHubProvider from "./providers/github";
 
 /**
  * Handles fetching of user tokens with code for the current session.
@@ -22,7 +22,7 @@ import { getGitHubUserData, getGitHubUserTokensWithCode, getGitHubUserTokensWith
 const fetchTokensWithCode = async (sessionId: string, key: string, provider: string): Promise<TokenResponse | null> => {
 	let tokenResponse = null;
 	if (provider === process.env.GITHUB_LOGIN_PROVIDER) {
-		tokenResponse = await getGitHubUserTokensWithCode(key);
+		tokenResponse = await GitHubProvider.getUserTokensWithCode(key);
 	}
 
 	// if unable to get valid token response, return null
@@ -220,7 +220,7 @@ const getUserProviderDataFromProvider = async (
 
 	let userProviderData = null;
 	if (provider === process.env.GITHUB_LOGIN_PROVIDER) {
-		userProviderData = await getGitHubUserData(accessToken);
+		userProviderData = await GitHubProvider.getUserData(accessToken);
 	}
 
 	return userProviderData;
@@ -269,7 +269,7 @@ const refreshProviderTokens = async (sessionId: string, userId: string | null, p
 		let tokenResponse = null;
 		if (provider === process.env.GITHUB_LOGIN_PROVIDER) {
 			// Assuming you have a function that uses the refresh token to get new tokens from GitHub
-			tokenResponse = await getGitHubUserTokensWithRefresh(refreshToken);
+			tokenResponse = await GitHubProvider.getUserTokensWithRefresh(refreshToken);
 		}
 
 		// save user tokens if response is valid

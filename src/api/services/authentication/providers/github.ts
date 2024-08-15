@@ -11,7 +11,7 @@ import { decrypt } from "../../cryptoService";
  *
  * @returns token response object if successful, null otherwise
  */
-const getGitHubUserTokensWithCode = async (key: string) => {
+const getUserTokensWithCode = async (key: string) => {
 	const code = decrypt(key);
 	try {
 		const response = await axios({
@@ -52,7 +52,7 @@ const getGitHubUserTokensWithCode = async (key: string) => {
  *
  * @returns token response object if successful, null otherwise
  */
-const getGitHubUserTokensWithRefresh = async (refreshToken: string) => {
+const getUserTokensWithRefresh = async (refreshToken: string) => {
 	try {
 		const response = await axios({
 			method: "post",
@@ -92,7 +92,7 @@ const getGitHubUserTokensWithRefresh = async (refreshToken: string) => {
  *
  * @returns user data from github
  */
-const getGitHubUserData = async (accessToken: string): Promise<UserProviderData | null> => {
+const getUserData = async (accessToken: string): Promise<UserProviderData | null> => {
 	try {
 		const userResponse = await axios({
 			method: "get",
@@ -148,8 +148,8 @@ const getGitHubUserData = async (accessToken: string): Promise<UserProviderData 
 }
 
 export {
-	getGitHubUserData,
-	getGitHubUserTokensWithCode,
-	getGitHubUserTokensWithRefresh
+	getUserData,
+	getUserTokensWithCode,
+	getUserTokensWithRefresh
 };
 
