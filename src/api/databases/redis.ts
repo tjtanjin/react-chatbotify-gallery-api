@@ -13,6 +13,7 @@ redisSessionClient.connect().catch(console.error)
 
 const redisSessionStore = new RedisStore({
 	client: redisSessionClient,
+	ttl: 7776000
 });
 
 // initialize redis ephemeral client

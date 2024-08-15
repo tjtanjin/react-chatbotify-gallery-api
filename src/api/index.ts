@@ -50,7 +50,9 @@ app.use(session({
 		// in production, use "lax" as frontend and backend have the same root domain
 		sameSite: process.env.NODE_ENV === "production" ? "lax" : "none",
 		// if not in production, leave domain as undefined
-		domain: process.env.NODE_ENV === "production" ? process.env.FRONTEND_WEBSITE_DOMAIN : undefined
+		domain: process.env.NODE_ENV === "production" ? process.env.FRONTEND_WEBSITE_DOMAIN : undefined,
+		// expire after 3 months
+		maxAge: 7776000
 	},
 }));
 
