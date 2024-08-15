@@ -78,7 +78,7 @@ Lastly, the *src* directory contains all of the application code. It is divided 
 
 The backend project consists of multiple microservices. When you run `npm run dev`, it triggers Docker Compose, which sets up the following networks and services:
 
-{todo: insert image}
+![image](https://github.com/user-attachments/assets/635029be-768b-40b3-88ff-0ebe15c577f4)
 
 We will briefly describe each of these services below.
 
