@@ -1,4 +1,4 @@
-{
+const authPaths = {
 	"/api/v1/auth/callback": {
 		"get": {
 			"tags": [
@@ -145,3 +145,5 @@
 		}
 	}
 }
+
+export default authPaths;

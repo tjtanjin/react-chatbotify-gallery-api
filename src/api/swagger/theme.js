@@ -1,4 +1,4 @@
-{
+const themePaths = {
 	"/api/v1/themes/": {
 		"get": {
 			"tags": [
@@ -349,3 +349,5 @@
 		}
 	}
 }
+
+export default themePaths;

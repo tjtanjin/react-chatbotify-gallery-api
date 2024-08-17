@@ -14,6 +14,7 @@ import authRoutes from "./routes/authRoutes";
 import themeRoutes from "./routes/themeRoutes";
 import userRoutes from "./routes/userRoutes";
 import { setUpMinioBucket } from "./services/minioService";
+import swaggerDocument from "./swagger";
 
 // load env variables
 dotenv.config();
@@ -67,23 +68,30 @@ app.use(`${API_PREFIX}/themes`, themeRoutes);
 app.use(`${API_PREFIX}/users`, userRoutes);
 
 // load the swagger docs only if not in production
-if (process.env.NODE_ENV !== 'production') {
-	const swaggerDocument = require("./swagger.json");
-	const jsonsInDir = fs.readdirSync(path.join(__dirname, "./swagger")).filter(file => path.extname(file) === '.json');
+if (process.env.NODE_ENV !== "production") {
+	const tsFilesInDir = fs.readdirSync(path.join(__dirname, "./swagger")).filter(file => path.extname(file) === ".js");
 	let result = {};
-	jsonsInDir.forEach(file => {
-		const fileData = fs.readFileSync(path.join(__dirname, './swagger', file));
-		result = { ...result, ...JSON.parse(fileData.toString()) };
-	});
-	swaggerDocument["paths"] = result;
-	app.use("/api-docs", (req: any, rest: any, next: any) => {
-		req.swaggerDoc = swaggerDocument;
-		next();
-	}, swaggerUi.serveFiles(swaggerDocument), swaggerUi.setup());
 
-	console.info(`Swagger docs loaded.`);
+	const loadSwaggerFiles = async () => {
+		for (const file of tsFilesInDir) {
+			const filePath = path.join(__dirname, "./swagger", file);
+			const fileData = await import(filePath);
+			result = { ...result, ...fileData.default };
+		}
+
+		(swaggerDocument as any).paths = result;
+
+		app.use("/api-docs", (req: any, res: any, next: any) => {
+			req.swaggerDoc = swaggerDocument;
+			next();
+		}, swaggerUi.serveFiles(swaggerDocument), swaggerUi.setup());
+
+		console.info(`Swagger docs loaded.`);
+	};
+
+	loadSwaggerFiles();
 } else {
-	console.info('Swagger docs are disabled in production.');
+	console.info("Swagger docs are disabled in production.");
 }
 
 // start server, default to port 3000 if not specified

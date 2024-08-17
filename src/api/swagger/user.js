@@ -1,4 +1,4 @@
-{
+const userPaths = {
 	"/api/v1/users/profile": {
 		"get": {
 			"tags": [
@@ -389,3 +389,5 @@
 		}
 	}
 }
+
+export default userPaths;
