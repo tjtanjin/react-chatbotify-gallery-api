@@ -16,8 +16,13 @@ const handleCallback = async (req: Request, res: Response) => {
 	if (req.query.error === "access_denied") {
 		return res.redirect(`${process.env.FRONTEND_WEBSITE_URL}/error`);
 	}
-	const key = encrypt(req.query.code as string);
-	res.redirect(`${process.env.FRONTEND_WEBSITE_URL}/login/process?provider=${process.env.GITHUB_LOGIN_PROVIDER}&key=${key}`);
+	try {
+		const key = encrypt(req.query.code as string);
+		res.redirect(`${process.env.FRONTEND_WEBSITE_URL}/login/process?provider=${process.env.GITHUB_LOGIN_PROVIDER}&key=${key}`);
+	} catch {
+		// todo: re-direct user to a more specific error page instead of a generic one - need to liase with frontend team
+		return res.redirect(`${process.env.FRONTEND_WEBSITE_URL}/error`);
+	}
 };
 
 /**
