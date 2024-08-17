@@ -51,11 +51,9 @@ const getThemes = async (req: Request, res: Response) => {
  * @returns list of theme versions on success, 500 error otherwise
  */
 const getThemeVersions = async (req: Request, res: Response) => {
-	const { theme_id } = req.params;
-
 	try {
 		const versions = await ThemeVersion.findAll({
-			where: { theme_id }
+			where: { theme_id: req.query.themeId }
 		});
 
 		res.json(versions);
