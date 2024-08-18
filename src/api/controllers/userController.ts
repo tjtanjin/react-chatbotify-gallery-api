@@ -3,6 +3,7 @@ import FavoriteTheme from "../databases/sql/models/FavoriteTheme";
 import Theme from "../databases/sql/models/Theme";
 import { sequelize } from "../databases/sql/sql";
 import { checkIsAdminUser } from "../services/authorization";
+import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
 /**
  * Retrieves the user profile information (i.e. user data).
@@ -19,11 +20,11 @@ const getUserProfile = async (req: Request, res: Response) => {
 
 	// if user id matches or user is admin, can retrieve user data
 	if (!queryUserId || queryUserId === sessionUserId || checkIsAdminUser(userData)) {
-		return res.json(userData);
+		return sendSuccessResponse(res, 200, userData, "User data fetched successfully.");
 	}
 
 	// all other cases unauthorized
-	return res.status(403).json({ error: "Unauthorized access" });
+	sendErrorResponse(res, 403, "Unauthorized access.");
 };
 
 /**
@@ -47,13 +48,13 @@ const getUserThemes = async (req: Request, res: Response) => {
 					user_id: userData.id
 				}
 			});
-			return res.json(themes);
+			return sendSuccessResponse(res, 200, themes, "Fetched user themes successfully.");
 		} catch {
 		}
 	}
 
 	// all other cases unauthorized
-	return res.status(403).json({ error: "Unauthorized access" });
+	sendErrorResponse(res, 403, "Unauthorized access.");
 };
 
 /**
@@ -78,13 +79,13 @@ const getUserFavoriteThemes = async (req: Request, res: Response) => {
 				},
 				include: [Theme]
 			});
-			res.json(userFavoriteThemes);
+			return sendSuccessResponse(res, 200, userFavoriteThemes, "Fetched user favorite themes successfully.");
 		} catch {
 		}
 	}
 
 	// all other cases unauthorized
-	return res.status(403).json({ error: "Unauthorized access" });
+	sendErrorResponse(res, 403, "Unauthorized access.");
 };
 
 /**
@@ -104,7 +105,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 			// check if the theme exists
 			const theme = await Theme.findByPk(theme_id, { transaction });
 			if (!theme) {
-				return res.status(404).json({ error: "Theme not found." });
+				return sendErrorResponse(res, 400, "Theme not found.");
 			}
 
 			// check if theme already favorited
@@ -117,7 +118,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 			});
 
 			if (existingFavorite) {
-				return res.status(400).json({ error: "Theme already favorited." });
+				return sendErrorResponse(res, 400, "Theme already favorited.");
 			}
 
 			// add favorite theme
@@ -130,10 +131,10 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 			await theme.increment("favorites_count", { by: 1, transaction });
 		});
 
-		res.status(201);
+		sendSuccessResponse(res, 201, {}, "Added theme to favorites successfully.");
 	} catch (error) {
 		console.error("Error adding favorite theme:", error);
-		res.status(500).json({ error: "Failed to add favorite theme." });
+		sendErrorResponse(res, 500, "Failed to add favorite theme.");
 	}
 };
 
@@ -161,7 +162,7 @@ const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 			});
 
 			if (!existingFavorite) {
-				return res.status(404).json({ error: "Favorite theme not found" });
+				return sendErrorResponse(res, 404, "Favorite theme not found");
 			}
 
 			// remove favorite theme
@@ -174,10 +175,10 @@ const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 			}
 		});
 
-		res.status(200);
+		sendSuccessResponse(res, 200, {}, "Removed theme from favorites successfully.");
 	} catch (error) {
 		console.error("Error removing favorite theme:", error);
-		res.status(500).json({ error: "Failed to remove favorite theme" });
+		sendErrorResponse(res, 500, "Failed to remove favorite theme");
 	}
 };
 

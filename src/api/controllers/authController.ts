@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { fetchTokensWithCode, getUserData, saveUserTokens } from "../services/authentication/authentication";
 import { encrypt } from "../services/cryptoService";
+import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
 /**
  * Handles the callback when a user authorizes or rejects the application.
@@ -41,25 +42,25 @@ const handleLoginProcess = async (req: Request, res: Response) => {
 
 	// if no provider specified, unable to login
 	if (!provider) {
-		return res.status(401).json({ error: "No login provider found, please try again." });
+		return sendErrorResponse(res, 401, "No login provider found, please try again.");
 	}
 
 	// if unable to fetch user tokens, get user to login again 
 	const tokenResponse = await fetchTokensWithCode(sessionId, req.query.key as string, provider);
 	if (!tokenResponse) {
-		return res.status(401).json({ error: "Login failed, please try again." });
+		return sendErrorResponse(res, 401, "Login failed, please try again.");
 	}
 
 	// get user data (will create user if new)
 	const userData = await getUserData(sessionId, null, provider);
 	if (!userData) {
-		return res.status(401).json({ error: "Login failed, please try again." });
+		return sendErrorResponse(res, 401, "Login failed, please try again.");
 	}
 
 	req.session.provider = provider;
 	req.session.userId = userData.id;
 	saveUserTokens(sessionId, userData.id, tokenResponse);
-	res.json(userData);
+	return sendSuccessResponse(res, 200, userData, "Login successful.");
 };
 
 export {

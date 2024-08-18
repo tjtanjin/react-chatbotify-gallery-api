@@ -4,6 +4,7 @@ import Theme from "../databases/sql/models/Theme";
 import ThemeJobQueue from "../databases/sql/models/ThemeJobQueue";
 import ThemeVersion from "../databases/sql/models/ThemeVersion";
 import { checkIsAdminUser } from "../services/authorization";
+import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
 /**
  * Handles fetching of themes.
@@ -36,9 +37,10 @@ const getThemes = async (req: Request, res: Response) => {
 			limit,
 			offset
 		});
-		res.json(themes);
+		sendSuccessResponse(res, 200, themes, "Themes fetched successfully.");
 	} catch (error) {
-		res.status(500).json({ error: "Failed to fetch themes" });
+		console.error("Error fetching themes:", error);
+		sendErrorResponse(res, 500, "Failed to fetch themes");
 	}
 };
 
@@ -56,10 +58,10 @@ const getThemeVersions = async (req: Request, res: Response) => {
 			where: { theme_id: req.query.themeId }
 		});
 
-		res.json(versions);
+		sendSuccessResponse(res, 200, versions, "Theme versions fetched successfully.");
 	} catch (error) {
 		console.error("Error fetching theme versions:", error);
-		res.status(500).json({ error: "Failed to fetch theme versions" });
+		sendErrorResponse(res, 500, "Failed to fetch theme versions");
 	}
 };
 
@@ -84,12 +86,13 @@ const publishTheme = async (req: Request, res: Response) => {
 	// 6) provide verbose reasons for frontend to render to user
 	const validationPassed = true;
 	if (!validationPassed) {
-		return res.status(400).json({ error: "Failed to publish theme, validation failed." });
+		// todo: populate array with validation error details in future
+		return sendErrorResponse(res, 400, "Failed to publish theme, validation failed.", []);
 	}
 
 	// add the new creation to theme job queue for processing later
 	try {
-		await ThemeJobQueue.create({
+		const themeJobQueueEntry = await ThemeJobQueue.create({
 			user_id: userData.id,
 			theme_id,
 			name,
@@ -99,10 +102,10 @@ const publishTheme = async (req: Request, res: Response) => {
 
 		// todo: push files into minio bucket with theme_id for process queue job to pick up
 
-		res.status(201);
+		sendSuccessResponse(res, 201, themeJobQueueEntry, "Themed queued for publishing.");
 	} catch (error) {
 		console.error("Error publishing theme:", error);
-		res.status(500).json({ error: "Failed to publish theme, please try again." });
+		sendErrorResponse(res, 500, "Failed to publish theme, please try again.")
 	}
 };
 
@@ -128,7 +131,7 @@ const unpublishTheme = async (req: Request, res: Response) => {
 
 		// if theme does not exist, cannot delete
 		if (!theme) {
-			return res.status(404).json({ error: "Failed to unpublish theme, the theme does not exist." });
+			return sendErrorResponse(res, 404, "Failed to unpublish theme, the theme does not exist.");
 		}
 
 		// if theme exist and user is admin, can delete
@@ -139,20 +142,20 @@ const unpublishTheme = async (req: Request, res: Response) => {
 
 		// todo: review how to handle unpublishing of themes, authors should not be allowed to delete themes anytime
 		// as there may be existing projects using their themes - perhaps separately have a support system for such action
-		return res.status(400).json({ error: "Feature not allowed." });
+		return sendErrorResponse(res, 400, "Feature not available yet.");
 
 		// if theme exist but user is not the theme author, cannot delete
 		// if (theme.dataValues.user_id != req.session.userId) {
-		// 	return res.status(403).json({ error: "Failed to unpublish theme, you are not the theme author." });
+		// sendErrorResponse(res, 403, "Failed to unpublish theme, you are not the theme author.");
 		// }
 
 		// delete the theme
 		// await theme.destroy();
 
-		// res.status(200);
+		// sendSuccessResponse(res, 200, theme, "Theme queued for unpublishing.");
 	} catch (error) {
 		console.error("Error unpublishing theme:", error);
-		res.status(500).json({ error: "Failed to unpublish theme, please try again." });
+		sendErrorResponse(res, 500, "Failed to unpublish theme, please try again.");
 	}
 };
 
