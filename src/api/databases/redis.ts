@@ -13,6 +13,7 @@ redisSessionClient.connect().catch(console.error)
 
 const redisSessionStore = new RedisStore({
 	client: redisSessionClient,
+	// matches express cookie expiry duration (redis store specifies ttl in seconds)
 	ttl: 7776000
 });
 
