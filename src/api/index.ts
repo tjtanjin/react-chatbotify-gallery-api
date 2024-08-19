@@ -56,8 +56,8 @@ app.use(session({
 		sameSite: process.env.NODE_ENV === "production" ? "lax" : "none",
 		// if not in production, leave domain as undefined
 		domain: process.env.NODE_ENV === "production" ? process.env.FRONTEND_WEBSITE_DOMAIN : undefined,
-		// expire after 3 months
-		maxAge: 7776000
+		// expire after 3 months (milliseconds)
+		maxAge: 7776000000
 	},
 }));
 
