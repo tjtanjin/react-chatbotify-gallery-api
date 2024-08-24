@@ -129,7 +129,7 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 			// if the provider with user doesn"t exist, add a new entry in LinkedAuthProvider
 			if (!linkedAuthProvider) {
 				await LinkedAuthProvider.create({
-					provider_user_id: userProviderData.provider_user_id,
+					providerUserId: userProviderData.providerUserId,
 					user_id: existingUser.dataValues.id,
 					provider: userProviderData.provider,
 				});
@@ -145,7 +145,7 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 
 		// Add mapping in the LinkedAuthProvider table
 		await LinkedAuthProvider.create({
-			provider_user_id: userProviderData.provider_user_id,
+			providerUserId: userProviderData.providerUserId,
 			user_id: newUser.dataValues.id,
 			provider: userProviderData.provider
 		});

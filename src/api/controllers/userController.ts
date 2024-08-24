@@ -98,12 +98,12 @@ const getUserFavoriteThemes = async (req: Request, res: Response) => {
  */
 const addUserFavoriteTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id } = req.body;
+	const { themeId } = req.body;
 
 	try {
 		await sequelize.transaction(async (transaction) => {
 			// check if the theme exists
-			const theme = await Theme.findByPk(theme_id, { transaction });
+			const theme = await Theme.findByPk(themeId, { transaction });
 			if (!theme) {
 				return sendErrorResponse(res, 400, "Theme not found.");
 			}
@@ -112,7 +112,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 			const existingFavorite = await FavoriteTheme.findOne({
 				where: {
 					user_id: userData.id,
-					id: theme_id
+					id: themeId
 				},
 				transaction
 			});
@@ -124,7 +124,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 			// add favorite theme
 			await FavoriteTheme.create({
 				user_id: userData.id,
-				id: theme_id
+				id: themeId
 			}, { transaction });
 
 			// increment the favorites count in the theme table
@@ -148,7 +148,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
  */
 const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id } = req.params;
+	const { themeId } = req.params;
 
 	try {
 		await sequelize.transaction(async (transaction) => {
@@ -156,7 +156,7 @@ const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 			const existingFavorite = await FavoriteTheme.findOne({
 				where: {
 					user_id: userData.id,
-					id: theme_id
+					id: themeId
 				},
 				transaction
 			});
@@ -169,7 +169,7 @@ const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 			await existingFavorite.destroy({ transaction });
 
 			// decrement the favorites count in the theme table
-			const theme = await Theme.findByPk(theme_id, { transaction });
+			const theme = await Theme.findByPk(themeId, { transaction });
 			if (theme) {
 				await theme.decrement("favorites_count", { by: 1, transaction });
 			}

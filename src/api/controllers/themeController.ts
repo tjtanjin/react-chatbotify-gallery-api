@@ -40,7 +40,7 @@ const getThemes = async (req: Request, res: Response) => {
 		sendSuccessResponse(res, 200, themes, "Themes fetched successfully.");
 	} catch (error) {
 		console.error("Error fetching themes:", error);
-		sendErrorResponse(res, 500, "Failed to fetch themes");
+		sendErrorResponse(res, 500, "Failed to fetch themes.");
 	}
 };
 
@@ -75,12 +75,12 @@ const getThemeVersions = async (req: Request, res: Response) => {
  */
 const publishTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id, name, description, version } = req.body;
+	const { themeId, name, description, version } = req.body;
 
 	// todo: perform checks in the following steps:
-	// 1) if theme_id already exist and user is not author, 403
-	// 2) if theme_id already exist and user is author but version already exist, 400
-	// 3) if theme_id does not exist or user is author of theme but has no existing version, continue below
+	// 1) if themeId already exist and user is not author, 403
+	// 2) if themeId already exist and user is author but version already exist, 400
+	// 3) if themeId does not exist or user is author of theme but has no existing version, continue below
 	// 4) rigorously validate file inputs (styles.json, styles.css, settings.json)
 	// 5) if fail checks, immediately return and don't do any further queuing or processing
 	// 6) provide verbose reasons for frontend to render to user
@@ -94,13 +94,13 @@ const publishTheme = async (req: Request, res: Response) => {
 	try {
 		const themeJobQueueEntry = await ThemeJobQueue.create({
 			user_id: userData.id,
-			theme_id,
+			theme_id: themeId,
 			name,
 			description,
 			action: "CREATE"
 		});
 
-		// todo: push files into minio bucket with theme_id for process queue job to pick up
+		// todo: push files into minio bucket with themeId for process queue job to pick up
 
 		sendSuccessResponse(res, 201, themeJobQueueEntry, "Themed queued for publishing.");
 	} catch (error) {
@@ -119,13 +119,13 @@ const publishTheme = async (req: Request, res: Response) => {
  */
 const unpublishTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id } = req.params;
+	const { themeId } = req.params;
 
 	// check if the theme exists and is owned by the user
 	try {
 		const theme = await Theme.findOne({
 			where: {
-				id: theme_id,
+				id: themeId,
 			}
 		});
 

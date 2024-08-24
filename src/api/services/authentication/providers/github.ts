@@ -133,11 +133,11 @@ const getUserData = async (accessToken: string): Promise<UserProviderData | null
 			name: data.name,
 			email: data.email,
 			handle: data.login,
-			avatar_url: data.avatar_url,
+			avatarUrl: data.avatar_url,
 			status: data.bio,
 			location: data.location,
-			profile_url: data.html_url,
-			provider_user_id: data.id,
+			profileUrl: data.html_url,
+			providerUserId: data.id,
 			provider: process.env.GITHUB_LOGIN_PROVIDER as string
 		};
 		return userProviderData;
