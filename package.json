@@ -21,7 +21,7 @@
   },
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\" \"types/**/*.ts\"",
-    "build": "npm run format && npx tsc --build",
+    "build": "npx tsc --build",
     "lint": "eslint \"{src,test,types}/**/*.ts\" --fix",
     "deploy-prod": "docker compose -p prod -f ./docker/docker-compose.yml down && docker compose -p prod -f ./docker/docker-compose.yml up --build -d",
     "stop-prod": "docker compose -p prod -f ./docker/docker-compose.yml down",
