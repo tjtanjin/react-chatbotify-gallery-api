@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize";
+import Logger from "../../logger";
 
 // setup sequelize with provided parameters
 const sequelize = new Sequelize({
@@ -15,7 +16,7 @@ const initializeDatabase = async () => {
 	try {
 		// connect to the database
 		await sequelize.authenticate();
-		console.info("Connection to the database has been established successfully.");
+		Logger.info("Connection to the database has been established successfully.");
 
 		// a primary instance is assigned to alter tables if necessary in development/playground
 		// not ideal, but works and good enough for now
@@ -25,9 +26,9 @@ const initializeDatabase = async () => {
 			await sequelize.sync();
 		}
 
-		console.info("All models were synchronized successfully.");
+		Logger.info("All models were synchronized successfully.");
 	} catch (error) {
-		console.error("Unable to connect to the database:", error);
+		Logger.error("Unable to connect to the database:", error);
 	}
 };
 

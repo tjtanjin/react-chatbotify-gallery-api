@@ -1,5 +1,6 @@
 import RedisStore from "connect-redis";
 import { createClient } from "redis";
+import Logger from "../logger";
 
 // initialize redis session client
 const redisSessionClient = createClient({
@@ -9,7 +10,7 @@ const redisSessionClient = createClient({
 		// todo: protect with passphrase?
 	}
 })
-redisSessionClient.connect().catch(console.error)
+redisSessionClient.connect().catch(Logger.error)
 
 const redisSessionStore = new RedisStore({
 	client: redisSessionClient,
@@ -24,7 +25,7 @@ const redisEphemeralClient = createClient({
 		// todo: protect with passphrase?
 	}
 });
-redisEphemeralClient.connect().catch(console.error);
+redisEphemeralClient.connect().catch(Logger.error);
 
 export {
 	redisEphemeralClient,

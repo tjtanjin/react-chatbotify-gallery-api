@@ -9,6 +9,7 @@ import { TokenResponse } from "../../interfaces/TokenResponse";
 import { UserData } from "../../interfaces/UserData";
 import { UserProviderData } from "../../interfaces/UserProviderData";
 import * as GitHubProvider from "./providers/github";
+import Logger from "../../logger";
 
 /**
  * Handles fetching of user tokens with code for the current session.
@@ -183,7 +184,7 @@ const saveUserTokens = async (sessionId: string, userId: string, tokenResponse: 
 
 		return true;
 	} catch (error) {
-		console.error("Error saving user tokens:", error);
+		Logger.error("Error saving user tokens:", error);
 		return false;
 	}
 };
@@ -282,7 +283,7 @@ const refreshProviderTokens = async (sessionId: string, userId: string | null, p
 		// if unable to save a valid token response, return null
 		return null;
 	} catch (error) {
-		console.error("Error during token refresh:", error);
+		Logger.error("Error during token refresh:", error);
 		return null;
 	}
 };

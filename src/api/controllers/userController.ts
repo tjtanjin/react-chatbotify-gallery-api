@@ -3,6 +3,7 @@ import FavoriteTheme from "../databases/sql/models/FavoriteTheme";
 import Theme from "../databases/sql/models/Theme";
 import { sequelize } from "../databases/sql/sql";
 import { checkIsAdminUser } from "../services/authorization";
+import Logger from "../logger";
 
 /**
  * Retrieves the user profile information (i.e. user data).
@@ -132,7 +133,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 
 		res.status(201);
 	} catch (error) {
-		console.error("Error adding favorite theme:", error);
+		Logger.error("Error adding favorite theme:", error);
 		res.status(500).json({ error: "Failed to add favorite theme." });
 	}
 };
@@ -176,7 +177,7 @@ const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 
 		res.status(200);
 	} catch (error) {
-		console.error("Error removing favorite theme:", error);
+		Logger.error("Error removing favorite theme:", error);
 		res.status(500).json({ error: "Failed to remove favorite theme" });
 	}
 };
