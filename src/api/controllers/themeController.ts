@@ -4,6 +4,7 @@ import Theme from "../databases/sql/models/Theme";
 import ThemeJobQueue from "../databases/sql/models/ThemeJobQueue";
 import ThemeVersion from "../databases/sql/models/ThemeVersion";
 import { checkIsAdminUser } from "../services/authorization";
+import Logger from "../logger";
 
 /**
  * Handles fetching of themes.
@@ -58,7 +59,7 @@ const getThemeVersions = async (req: Request, res: Response) => {
 
 		res.json(versions);
 	} catch (error) {
-		console.error("Error fetching theme versions:", error);
+		Logger.error("Error fetching theme versions:", error);
 		res.status(500).json({ error: "Failed to fetch theme versions" });
 	}
 };
@@ -101,7 +102,7 @@ const publishTheme = async (req: Request, res: Response) => {
 
 		res.status(201);
 	} catch (error) {
-		console.error("Error publishing theme:", error);
+		Logger.error("Error publishing theme:", error);
 		res.status(500).json({ error: "Failed to publish theme, please try again." });
 	}
 };
@@ -151,7 +152,7 @@ const unpublishTheme = async (req: Request, res: Response) => {
 
 		// res.status(200);
 	} catch (error) {
-		console.error("Error unpublishing theme:", error);
+		Logger.error("Error unpublishing theme:", error);
 		res.status(500).json({ error: "Failed to unpublish theme, please try again." });
 	}
 };

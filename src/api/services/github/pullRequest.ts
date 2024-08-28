@@ -1,6 +1,7 @@
 // ignore this entire file for now, unused but will re-look later
 import axios, { AxiosRequestConfig } from "axios";
 import { readFileSync } from "fs";
+import Logger from "../../logger";
 
 const owner = "tjtanjin";
 const repo = "test-themes";
@@ -30,10 +31,10 @@ async function createBranch() {
 			},
 			config
 		);
-		console.info("Branch created:", response.data);
+		Logger.info("Branch created:", response.data);
 		return true;
 	} catch (error) {
-		console.error("Error creating branch:", error);
+		Logger.error("Error creating branch:", error);
 		return false;
 	}
 }
@@ -53,10 +54,10 @@ async function addFile() {
 			},
 			{ headers: headers }
 		);
-		console.info("File added:", response.data);
+		Logger.info("File added:", response.data);
 		return true;
 	} catch (error) {
-		console.error("Error adding file:", error);
+		Logger.error("Error adding file:", error);
 		return false;
 	}
 }
@@ -73,10 +74,10 @@ async function createPullRequest() {
 			},
 			{ headers: headers }
 		);
-		console.info("Pull request created:", response.data);
+		Logger.info("Pull request created:", response.data);
 		return true;
 	} catch (error) {
-		console.error("Error creating pull request:", error);
+		Logger.error("Error creating pull request:", error);
 		return false;
 	}
 }

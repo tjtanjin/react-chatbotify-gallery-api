@@ -1,4 +1,5 @@
 import { BucketItem, Client, ClientOptions } from "minio";
+import Logger from "../logger";
 
 // define minio client options based on parameters
 const minioClientOptions: ClientOptions = {
@@ -17,7 +18,7 @@ const setUpMinioBucket = async () => {
 	try {
 		await createBucketIfNotExists("theme-jobs-queue");
 	} catch (err) {
-		console.error("Failed to initialize MinIO bucket:", err);
+		Logger.error("Failed to initialize MinIO bucket:", err);
 	}
 };
 
@@ -31,16 +32,16 @@ const createBucketIfNotExists = async (bucketName: string): Promise<void> => {
 		const bucketExists = await minioClient.bucketExists(bucketName);
 		if (!bucketExists) {
 			await minioClient.makeBucket(bucketName, "");
-			console.info(`Bucket ${bucketName} created successfully.`);
+			Logger.info(`Bucket ${bucketName} created successfully.`);
 		} else {
-			console.info(`Bucket ${bucketName} already exists.`);
+			Logger.info(`Bucket ${bucketName} already exists.`);
 		}
 	} catch (err: any) {
 		// if bucket already owned, not an error (possible due to multiple api instances)
 		if (err.code == "BucketAlreadyOwnedByYou") {
 			return;
 		}
-		console.error("Error checking or creating bucket:", err);
+		Logger.error("Error checking or creating bucket:", err);
 		throw err;
 	}
 };
@@ -55,9 +56,9 @@ const createBucketIfNotExists = async (bucketName: string): Promise<void> => {
 const uploadFile = async (bucketName: string, objectName: string, filePath: string): Promise<void> => {
 	try {
 		await minioClient.fPutObject(bucketName, objectName, filePath);
-		console.info(`File ${objectName} uploaded successfully.`);
+		Logger.info(`File ${objectName} uploaded successfully.`);
 	} catch (err: any) {
-		console.error("Error uploading file:", err);
+		Logger.error("Error uploading file:", err);
 		throw err;
 	}
 };
@@ -81,7 +82,7 @@ const getFile = async (bucketName: string, objectName: string): Promise<BucketIt
 		// if no object is found, return null
 		return null;
 	} catch (err: any) {
-		console.error("Error retrieving file:", err);
+		Logger.error("Error retrieving file:", err);
 		throw err;
 	}
 };
@@ -95,9 +96,9 @@ const getFile = async (bucketName: string, objectName: string): Promise<BucketIt
 const deleteFile = async (bucketName: string, objectName: string): Promise<void> => {
 	try {
 		await minioClient.removeObject(bucketName, objectName);
-		console.info(`File ${objectName} deleted successfully.`);
+		Logger.info(`File ${objectName} deleted successfully.`);
 	} catch (err: any) {
-		console.error("Error deleting file:", err);
+		Logger.error("Error deleting file:", err);
 		throw err;
 	}
 };
