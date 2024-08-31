@@ -35,16 +35,16 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": true,
-								"message": "Themes retrieved successfully.",
+								"message": "Themes fetched successfully.",
 								"data": [
 									{
-										"id": "dark_theme",
-										"name": "Dark Theme",
-										"description": "A sleek, dark theme.",
+										"id": "terminal",
+										"name": "Terminal",
+										"description": "For the geeks!",
 										"favoritesCount": "10",
 										"createdAt": "2024-08-07T18:43:21.000Z",
 										"updatedAt": "2024-08-07T18:43:21.000Z",
-										"user_id": null
+										"userId": null
 									}
 								],
 								"errors": []
@@ -91,13 +91,13 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": true,
-								"message": "Theme versions retrieved successfully.",
+								"message": "Theme versions fetched successfully.",
 								"data": [
 									{
-										"id": "version1",
-										"themeId": "theme123",
+										"id": "4019665a-c621-4a7b-ba8d-88572f72b5bc",
+										"themeId": "terminal",
 										"version": "1.0.0",
-										"createdAt": "2023-01-01T00:00:00Z"
+										"createdAt": "2024-08-07T18:43:21.000Z"
 									}
 								],
 								"errors": []
@@ -112,9 +112,9 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": false,
-								"message": "Internal server error.",
+								"message": "Failed to fetch theme versions.",
 								"data": null,
-								"errors": ["An error occurred while retrieving theme versions."]
+								"errors": []
 							}
 						}
 					}
@@ -185,12 +185,12 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": true,
-								"message": "Theme published successfully.",
+								"message": "Theme queued for publishing.",
 								"data": {
-									"id": "theme123",
-									"name": "Dark Theme",
-									"description": "A sleek, dark theme.",
-									"version": "1.0.0"
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
+									"version": "1.1.0"
 								},
 								"errors": []
 							}
@@ -204,9 +204,9 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": false,
-								"message": "Validation failed.",
+								"message": "Failed to publish theme, validation failed.",
 								"data": null,
-								"errors": ["The theme name is required."]
+								"errors": []
 							}
 						}
 					}
@@ -218,9 +218,9 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": false,
-								"message": "Internal server error.",
+								"message": "Failed to publish theme, please try again.",
 								"data": null,
-								"errors": ["An error occurred while publishing the theme."]
+								"errors": []
 							}
 						}
 					}
@@ -250,12 +250,12 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": true,
-								"message": "Theme unpublished successfully.",
+								"message": "Theme queued for unpublishing.",
 								"data": {
-									"id": "theme123",
-									"name": "Dark Theme",
-									"description": "A sleek, dark theme.",
-									"version": "1.0.0"
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
+									"version": "1.1.0"
 								},
 								"errors": []
 							}
@@ -269,9 +269,23 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": false,
-								"message": "Unpublish feature not allowed.",
+								"message": "Feature not available yet.",
 								"data": null,
-								"errors": ["Unpublishing is not allowed for this theme."]
+								"errors": []
+							}
+						}
+					}
+				},
+				"404": {
+					"description": "Theme not found.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to unpublish theme, the theme does not exist.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -283,9 +297,9 @@ const themePaths = {
 							"schema": { "$ref": "#/components/schemas/ApiResult" },
 							"example": {
 								"success": false,
-								"message": "Internal server error.",
+								"message": "Failed to unpublish theme, please try again.",
 								"data": null,
-								"errors": ["An error occurred while unpublishing the theme."]
+								"errors": []
 							}
 						}
 					}

@@ -14,6 +14,7 @@ import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
  */
 const handleCallback = async (req: Request, res: Response) => {
 	// todo: re-direct user to a more specific error page instead of a generic one - need to liase with frontend team
+	// todo: note that exact error message may differ based on provider
 	if (req.query.error === "access_denied") {
 		return res.redirect(`${process.env.FRONTEND_WEBSITE_URL}/error`);
 	}
@@ -42,7 +43,7 @@ const handleLoginProcess = async (req: Request, res: Response) => {
 
 	// if no provider specified, unable to login
 	if (!provider) {
-		return sendErrorResponse(res, 401, "No login provider found, please try again.");
+		return sendErrorResponse(res, 401, "Login failed, please try again.");
 	}
 
 	// if unable to fetch user tokens, get user to login again 

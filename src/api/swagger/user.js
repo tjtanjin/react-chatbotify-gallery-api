@@ -27,7 +27,7 @@ const userPaths = {
 							},
 							"example": {
 								"success": true,
-								"message": "User profile retrieved successfully.",
+								"message": "User data fetched successfully.",
 								"data": {
 									"id": "user123",
 									"role": "admin",
@@ -57,7 +57,7 @@ const userPaths = {
 								"success": false,
 								"message": "Unauthorized access.",
 								"data": null,
-								"errors": ["User is not authorized to access this resource."]
+								"errors": []
 							}
 						}
 					}
@@ -93,12 +93,12 @@ const userPaths = {
 							},
 							"example": {
 								"success": true,
-								"message": "Themes retrieved successfully.",
+								"message": "User themes fetched successfully.",
 								"data": [
 									{
-										"id": "theme123",
-										"name": "Dark Mode",
-										"description": "A sleek dark theme.",
+										"id": "terminal",
+										"name": "Terminal",
+										"description": "For the geeks!",
 										"version": "1.0.0"
 									}
 								],
@@ -118,7 +118,7 @@ const userPaths = {
 								"success": false,
 								"message": "Unauthorized access.",
 								"data": null,
-								"errors": ["User is not authorized to access this resource."]
+								"errors": []
 							}
 						}
 					}
@@ -154,7 +154,7 @@ const userPaths = {
 							},
 							"example": {
 								"success": true,
-								"message": "Favorited themes retrieved successfully.",
+								"message": "User favorite themes fetched successfully.",
 								"data": [
 									{
 										"id": "theme123",
@@ -179,7 +179,7 @@ const userPaths = {
 								"success": false,
 								"message": "Unauthorized access.",
 								"data": null,
-								"errors": ["User is not authorized to access this resource."]
+								"errors": []
 							}
 						}
 					}
@@ -218,11 +218,11 @@ const userPaths = {
 							},
 							"example": {
 								"success": true,
-								"message": "Theme added to favorites successfully.",
+								"message": "Added theme to favorites successfully.",
 								"data": {
-									"id": "theme123",
-									"name": "Dark Mode",
-									"description": "A sleek dark theme.",
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
 									"version": "1.0.0"
 								},
 								"errors": []
@@ -241,7 +241,7 @@ const userPaths = {
 								"success": false,
 								"message": "Theme not found.",
 								"data": null,
-								"errors": ["The specified theme could not be found."]
+								"errors": []
 							}
 						}
 					}
@@ -257,7 +257,7 @@ const userPaths = {
 								"success": false,
 								"message": "Theme already favorited.",
 								"data": null,
-								"errors": ["The theme is already in the user's favorites."]
+								"errors": []
 							}
 						}
 					}
@@ -271,9 +271,9 @@ const userPaths = {
 							},
 							"example": {
 								"success": false,
-								"message": "Internal server error.",
+								"message": "Failed to add favorite theme.",
 								"data": null,
-								"errors": ["An error occurred while processing the request."]
+								"errors": []
 							}
 						}
 					}
@@ -307,11 +307,11 @@ const userPaths = {
 							},
 							"example": {
 								"success": true,
-								"message": "Theme removed from favorites successfully.",
+								"message": "Removed theme from favorites successfully.",
 								"data": {
-									"id": "theme123",
-									"name": "Dark Mode",
-									"description": "A sleek dark theme.",
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
 									"version": "1.0.0"
 								},
 								"errors": []
@@ -330,7 +330,7 @@ const userPaths = {
 								"success": false,
 								"message": "Favorite theme not found.",
 								"data": null,
-								"errors": ["The specified favorite theme could not be found."]
+								"errors": []
 							}
 						}
 					}
@@ -344,9 +344,9 @@ const userPaths = {
 							},
 							"example": {
 								"success": false,
-								"message": "Internal server error.",
+								"message": "Failed to remove favorite theme.",
 								"data": null,
-								"errors": ["An error occurred while processing the request."]
+								"errors": []
 							}
 						}
 					}

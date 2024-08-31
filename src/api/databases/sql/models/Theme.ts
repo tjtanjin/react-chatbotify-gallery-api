@@ -24,20 +24,22 @@ Theme.init({
 		allowNull: true
 	},
 	// number of favorites given to the theme
-	favorites_count: {
+	favoritesCount: {
 		type: DataTypes.INTEGER,
-		defaultValue: 0
+		defaultValue: 0,
+		field: "favorites_count"
 	},
 	// date when the theme is created, based on when it was synced in from github
-	created_at: {
+	createdAt: {
 		type: DataTypes.DATE,
-		defaultValue: sequelize.literal("NOW()")
+		defaultValue: sequelize.literal("NOW()"),
+		field: "created_at"
 	},
-	// todo: currently this field isn"t updated because version isn"t integrated yet
 	// date when the theme was last updated, based on when sync detects a version upgrade
-	updated_at: {
+	updatedAt: {
 		type: DataTypes.DATE,
-		defaultValue: sequelize.literal("NOW()")
+		defaultValue: sequelize.literal("NOW()"),
+		field: "updated_at"
 	}
 }, {
 	sequelize,
@@ -46,7 +48,7 @@ Theme.init({
 });
 
 // theme belongs to a user, but permitted to be empty (for direct theme contributions to github repository)
-// todo: perhaps the sync job csn attempt to reconcile theme ownership each time it is run based on meta.json author?
-Theme.belongsTo(User, { foreignKey: "user_id" });
+// todo: perhaps the sync job can attempt to reconcile theme ownership each time it is run based on meta.json author?
+Theme.belongsTo(User, { foreignKey: "userId" });
 
 export default Theme;

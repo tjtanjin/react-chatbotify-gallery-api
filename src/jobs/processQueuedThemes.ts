@@ -19,7 +19,7 @@ const runProcessThemeQueue = async () => {
 	console.info(toAdd);
 	console.info(toRemove);
 
-	// todo: upon successful update of thenes, update their updated_at field within the theme table
+	// todo: upon successful update of thenes, update their updatedAt field within the theme table
 }
 
 /**

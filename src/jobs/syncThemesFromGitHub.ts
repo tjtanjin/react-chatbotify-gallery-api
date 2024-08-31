@@ -91,9 +91,9 @@ const runSyncThemesFromGitHub = async () => {
 					}, { transaction });
 
 					await ThemeVersion.create({
-						theme_id: themeId,
+						themeId: themeId,
 						version: metaData.version,
-						created_at: sequelize.literal("NOW()")
+						createdAt: sequelize.literal("NOW()")
 					}, { transaction });
 
 					await transaction.commit();

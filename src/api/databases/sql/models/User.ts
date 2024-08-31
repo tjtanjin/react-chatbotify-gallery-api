@@ -1,7 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../sql";
 
-
 /**
  * Stores the data of users.
  */
@@ -27,20 +26,23 @@ User.init({
 		allowNull: false
 	},
 	// date when the user accepted the author agreement (necessary to publish themes/plugins)
-	accepted_author_agreement: {
+	acceptedAuthorAgreement: {
 		type: DataTypes.DATE,
 		allowNull: true,
-		defaultValue: null // default to null which is not agreed yet
+		defaultValue: null, // default to null which is not agreed yet
+		field: "accepted_author_agreement"
 	},
 	// date when user was created
-	created_at: {
+	createdAt: {
 		type: DataTypes.DATE,
-		defaultValue: sequelize.literal("NOW()")
+		defaultValue: sequelize.literal("NOW()"),
+		field: "created_at"
 	},
 	// date when user was last updated
-	updated_at: {
+	updatedAt: {
 		type: DataTypes.DATE,
-		defaultValue: sequelize.literal("NOW()")
+		defaultValue: sequelize.literal("NOW()"),
+		field: "updated_at"
 	}
 }, {
 	sequelize,

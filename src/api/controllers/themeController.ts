@@ -55,13 +55,13 @@ const getThemes = async (req: Request, res: Response) => {
 const getThemeVersions = async (req: Request, res: Response) => {
 	try {
 		const versions = await ThemeVersion.findAll({
-			where: { theme_id: req.query.themeId }
+			where: { themeId: req.query.themeId }
 		});
 
 		sendSuccessResponse(res, 200, versions, "Theme versions fetched successfully.");
 	} catch (error) {
 		console.error("Error fetching theme versions:", error);
-		sendErrorResponse(res, 500, "Failed to fetch theme versions");
+		sendErrorResponse(res, 500, "Failed to fetch theme versions.");
 	}
 };
 
@@ -93,8 +93,8 @@ const publishTheme = async (req: Request, res: Response) => {
 	// add the new creation to theme job queue for processing later
 	try {
 		const themeJobQueueEntry = await ThemeJobQueue.create({
-			user_id: userData.id,
-			theme_id: themeId,
+			userId: userData.id,
+			themeId: themeId,
 			name,
 			description,
 			action: "CREATE"
@@ -145,7 +145,7 @@ const unpublishTheme = async (req: Request, res: Response) => {
 		return sendErrorResponse(res, 400, "Feature not available yet.");
 
 		// if theme exist but user is not the theme author, cannot delete
-		// if (theme.dataValues.user_id != req.session.userId) {
+		// if (theme.dataValues.userId != req.session.userId) {
 		// sendErrorResponse(res, 403, "Failed to unpublish theme, you are not the theme author.");
 		// }
 

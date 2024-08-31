@@ -9,7 +9,7 @@ class UserRefreshToken extends Model { }
 
 UserRefreshToken.init({
 	// user id to identify who the refresh token belongs to
-	user_id: {
+	userId: {
 		type: DataTypes.UUID,
 		allowNull: false,
 		references: {
@@ -17,17 +17,20 @@ UserRefreshToken.init({
 			key: "id"
 		},
 		onDelete: "CASCADE",
-		primaryKey: true
+		primaryKey: true,
+		field: "user_id"
 	},
 	// actual refresh token
-	refresh_token: {
+	refreshToken: {
 		type: DataTypes.STRING,
-		allowNull: false
+		allowNull: false,
+		field: "refresh_token"
 	},
 	// date when refresh token expires
-	expiry_date: {
+	expiryDate: {
 		type: DataTypes.DATE,
-		allowNull: false
+		allowNull: false,
+		field: "expiry_date"
 	}
 }, {
 	sequelize,
