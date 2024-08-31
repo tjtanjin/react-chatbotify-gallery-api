@@ -12,3 +12,11 @@
 # env files
 /config/env/*
 !/config/env/.env.template
+
+#log files
+/logs
+/logs/all.log
+/logs/error.log
+
+# IntelliJ IDEA
+.idea

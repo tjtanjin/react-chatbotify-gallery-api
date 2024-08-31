@@ -15,6 +15,7 @@ import themeRoutes from "./routes/themeRoutes";
 import userRoutes from "./routes/userRoutes";
 import { setUpMinioBucket } from "./services/minioService";
 import swaggerDocument from "./swagger";
+import Logger from "./logger";
 
 // load env variables
 dotenv.config();
@@ -94,16 +95,16 @@ if (process.env.NODE_ENV !== "production") {
 			next();
 		}, swaggerUi.serveFiles(swaggerDocument, { swaggerOptions: { defaultModelsExpandDepth: -1 } }), swaggerUi.setup());
 
-		console.info(`Swagger docs loaded.`);
+		Logger.info(`Swagger docs loaded.`);
 	};
 
 	loadSwaggerFiles();
 } else {
-	console.info("Swagger docs are disabled in production.");
+	Logger.info("Swagger docs are disabled in production.");
 }
 
 // start server, default to port 3000 if not specified
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-	console.info(`Server is running on port ${PORT}`);
+	Logger.info(`Server is running on port ${PORT}`);
 });

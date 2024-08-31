@@ -1,3 +1,5 @@
+import Logger from "../api/logger";
+
 /**
  * Runs the job for processing theme queue.
  */
@@ -16,8 +18,8 @@ const runProcessThemeQueue = async () => {
 	const toRemove = await fetchFilesToDelete(themesToDelete);
 
 	// todo: use a github application to create pull requests to the themes repository to add/remove files
-	console.info(toAdd);
-	console.info(toRemove);
+	Logger.info(toAdd);
+	Logger.info(toRemove);
 
 	// todo: upon successful update of thenes, update their updatedAt field within the theme table
 }

@@ -3,6 +3,7 @@ import axios from "axios";
 import { TokenResponse } from "../../../interfaces/TokenResponse";
 import { UserProviderData } from "../../../interfaces/UserProviderData";
 import { decrypt } from "../../cryptoService";
+import Logger from "../../../logger";
 
 /**
  * Retrieves access and refresh token with auth code.
@@ -40,7 +41,7 @@ const getUserTokensWithCode = async (key: string) => {
 		}
 		return tokenResponse;
 	} catch (error) {
-		console.error("Error getting access token from GitHub:", error);
+		Logger.error("Error getting access token from GitHub:", error);
 		return null;
 	}
 }
@@ -80,7 +81,7 @@ const getUserTokensWithRefresh = async (refreshToken: string) => {
 		}
 		return tokenResponse;
 	} catch (error) {
-		console.error("Error refreshing GitHub tokens:", error);
+		Logger.error("Error refreshing GitHub tokens:", error);
 		throw error;
 	}
 };
@@ -142,7 +143,7 @@ const getUserData = async (accessToken: string): Promise<UserProviderData | null
 		};
 		return userProviderData;
 	} catch (error) {
-		console.error("Error fetching user data from GitHub:", error);
+		Logger.error("Error fetching user data from GitHub:", error);
 		return null;
 	}
 }

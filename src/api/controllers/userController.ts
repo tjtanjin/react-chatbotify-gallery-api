@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import FavoriteTheme from "../databases/sql/models/FavoriteTheme";
 import Theme from "../databases/sql/models/Theme";
 import { sequelize } from "../databases/sql/sql";
+import Logger from "../logger";
 import { checkIsAdminUser } from "../services/authorization";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
@@ -133,7 +134,7 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
 
 		sendSuccessResponse(res, 201, {}, "Added theme to favorites successfully.");
 	} catch (error) {
-		console.error("Error adding favorite theme:", error);
+		Logger.error("Error adding favorite theme:", error);
 		sendErrorResponse(res, 500, "Failed to add favorite theme.");
 	}
 };
@@ -177,7 +178,7 @@ const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 
 		sendSuccessResponse(res, 200, {}, "Removed theme from favorites successfully.");
 	} catch (error) {
-		console.error("Error removing favorite theme:", error);
+		Logger.error("Error removing favorite theme:", error);
 		sendErrorResponse(res, 500, "Failed to remove favorite theme.");
 	}
 };

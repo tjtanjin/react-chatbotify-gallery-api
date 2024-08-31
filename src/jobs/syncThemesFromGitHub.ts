@@ -5,6 +5,7 @@ import ThemeVersion from "../api/databases/sql/models/ThemeVersion";
 import { sequelize } from "../api/databases/sql/sql";
 import { GitHubRepoContent } from "../api/interfaces/GitHubRepoContent";
 import { ThemeMetaData } from "../api/interfaces/ThemeMetaData";
+import Logger from "../api/logger";
 
 /**
  * Fetch theme folder names (i.e. theme ids) from github.
@@ -20,10 +21,10 @@ const fetchFolders = async (): Promise<string[]> => {
 		const response = await axios.get<GitHubRepoContent[]>(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`);
 		const folders = response.data.filter(item => item.type === "dir").map(item => item.name);
 
-		console.info("Fetched folders:", folders);
+		Logger.info("Fetched folders:", folders);
 		return folders;
 	} catch (error) {
-		console.error("Error fetching folders from GitHub:", error);
+		Logger.error("Error fetching folders from GitHub:", error);
 		return [];
 	}
 };
@@ -41,7 +42,7 @@ const fetchMetaJson = async (themeName: string): Promise<ThemeMetaData | null> =
 		const response = await axios.get<ThemeMetaData>(url);
 		return response.data;
 	} catch (error) {
-		console.error(`Error fetching meta.json for theme ${themeName}:`, error);
+		Logger.error(`Error fetching meta.json for theme ${themeName}:`, error);
 		return null;
 	}
 };
@@ -74,7 +75,7 @@ const runSyncThemesFromGitHub = async () => {
 					id: themesToDelete
 				}
 			});
-			console.info(`Deleted themes from database: ${themesToDelete}`);
+			Logger.info(`Deleted themes from database: ${themesToDelete}`);
 		}
 
 		// create new themes found on github, and update versioning table as well
@@ -97,17 +98,17 @@ const runSyncThemesFromGitHub = async () => {
 					}, { transaction });
 
 					await transaction.commit();
-					console.info(`Created theme and version in database: ${themeId}`);
+					Logger.info(`Created theme and version in database: ${themeId}`);
 				} else {
 					throw new Error(`Missing meta.json data for theme: ${themeId}`);
 				}
 			} catch (error) {
 				await transaction.rollback();
-				console.error(`Failed to create theme ${themeId}: ${error}`);
+				Logger.error(`Failed to create theme ${themeId}: ${error}`);
 			}
 		}
 	} catch (error) {
-		console.error("Error fetching themes:", error);
+		Logger.error("Error fetching themes:", error);
 		// todo: send an alert on failure since this is critical?
 	}
 }

@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import Theme from "../databases/sql/models/Theme";
 import ThemeJobQueue from "../databases/sql/models/ThemeJobQueue";
 import ThemeVersion from "../databases/sql/models/ThemeVersion";
+import Logger from "../logger";
 import { checkIsAdminUser } from "../services/authorization";
 import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
@@ -39,7 +40,7 @@ const getThemes = async (req: Request, res: Response) => {
 		});
 		sendSuccessResponse(res, 200, themes, "Themes fetched successfully.");
 	} catch (error) {
-		console.error("Error fetching themes:", error);
+		Logger.error("Error fetching themes:", error);
 		sendErrorResponse(res, 500, "Failed to fetch themes.");
 	}
 };
@@ -60,7 +61,7 @@ const getThemeVersions = async (req: Request, res: Response) => {
 
 		sendSuccessResponse(res, 200, versions, "Theme versions fetched successfully.");
 	} catch (error) {
-		console.error("Error fetching theme versions:", error);
+		Logger.error("Error fetching theme versions:", error);
 		sendErrorResponse(res, 500, "Failed to fetch theme versions.");
 	}
 };
@@ -104,8 +105,8 @@ const publishTheme = async (req: Request, res: Response) => {
 
 		sendSuccessResponse(res, 201, themeJobQueueEntry, "Themed queued for publishing.");
 	} catch (error) {
-		console.error("Error publishing theme:", error);
-		sendErrorResponse(res, 500, "Failed to publish theme, please try again.")
+		Logger.error("Error publishing theme:", error);
+		sendErrorResponse(res, 500, "Failed to publish theme, please try again.");
 	}
 };
 
@@ -154,7 +155,7 @@ const unpublishTheme = async (req: Request, res: Response) => {
 
 		// sendSuccessResponse(res, 200, theme, "Theme queued for unpublishing.");
 	} catch (error) {
-		console.error("Error unpublishing theme:", error);
+		Logger.error("Error unpublishing theme:", error);
 		sendErrorResponse(res, 500, "Failed to unpublish theme, please try again.");
 	}
 };
