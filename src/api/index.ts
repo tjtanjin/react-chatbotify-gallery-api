@@ -70,7 +70,10 @@ app.use(`${API_PREFIX}/users`, userRoutes);
 
 // load the swagger docs only if not in production
 if (process.env.NODE_ENV !== "production") {
-	const tsFilesInDir = fs.readdirSync(path.join(__dirname, "./swagger")).filter(file => path.extname(file) === ".js");
+	// grab all swagger path files, excluding components
+	const tsFilesInDir = fs.readdirSync(path.join(__dirname, "./swagger"))
+		.filter(file => path.extname(file) === ".js" && file !== "components.js");
+
 	let result = {};
 
 	const loadSwaggerFiles = async () => {
@@ -80,12 +83,17 @@ if (process.env.NODE_ENV !== "production") {
 			result = { ...result, ...fileData.default };
 		}
 
+		// load components.js separately and merge into the swagger document
+		const componentsPath = path.join(__dirname, "./swagger", "components.js");
+		const componentsData = await import(componentsPath);
+
 		(swaggerDocument as any).paths = result;
+		(swaggerDocument as any).components = componentsData.default.components;
 
 		app.use("/api-docs", (req: any, res: any, next: any) => {
 			req.swaggerDoc = swaggerDocument;
 			next();
-		}, swaggerUi.serveFiles(swaggerDocument), swaggerUi.setup());
+		}, swaggerUi.serveFiles(swaggerDocument, { swaggerOptions: { defaultModelsExpandDepth: -1 } }), swaggerUi.setup());
 
 		Logger.info(`Swagger docs loaded.`);
 	};

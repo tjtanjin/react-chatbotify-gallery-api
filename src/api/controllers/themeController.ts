@@ -3,8 +3,9 @@ import { Op } from "sequelize";
 import Theme from "../databases/sql/models/Theme";
 import ThemeJobQueue from "../databases/sql/models/ThemeJobQueue";
 import ThemeVersion from "../databases/sql/models/ThemeVersion";
-import { checkIsAdminUser } from "../services/authorization";
 import Logger from "../logger";
+import { checkIsAdminUser } from "../services/authorization";
+import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
 /**
  * Handles fetching of themes.
@@ -37,9 +38,10 @@ const getThemes = async (req: Request, res: Response) => {
 			limit,
 			offset
 		});
-		res.json(themes);
+		sendSuccessResponse(res, 200, themes, "Themes fetched successfully.");
 	} catch (error) {
-		res.status(500).json({ error: "Failed to fetch themes" });
+		Logger.error("Error fetching themes:", error);
+		sendErrorResponse(res, 500, "Failed to fetch themes.");
 	}
 };
 
@@ -54,13 +56,13 @@ const getThemes = async (req: Request, res: Response) => {
 const getThemeVersions = async (req: Request, res: Response) => {
 	try {
 		const versions = await ThemeVersion.findAll({
-			where: { theme_id: req.query.themeId }
+			where: { themeId: req.query.themeId }
 		});
 
-		res.json(versions);
+		sendSuccessResponse(res, 200, versions, "Theme versions fetched successfully.");
 	} catch (error) {
 		Logger.error("Error fetching theme versions:", error);
-		res.status(500).json({ error: "Failed to fetch theme versions" });
+		sendErrorResponse(res, 500, "Failed to fetch theme versions.");
 	}
 };
 
@@ -74,36 +76,37 @@ const getThemeVersions = async (req: Request, res: Response) => {
  */
 const publishTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id, name, description, version } = req.body;
+	const { themeId, name, description, version } = req.body;
 
 	// todo: perform checks in the following steps:
-	// 1) if theme_id already exist and user is not author, 403
-	// 2) if theme_id already exist and user is author but version already exist, 400
-	// 3) if theme_id does not exist or user is author of theme but has no existing version, continue below
+	// 1) if themeId already exist and user is not author, 403
+	// 2) if themeId already exist and user is author but version already exist, 400
+	// 3) if themeId does not exist or user is author of theme but has no existing version, continue below
 	// 4) rigorously validate file inputs (styles.json, styles.css, settings.json)
 	// 5) if fail checks, immediately return and don't do any further queuing or processing
 	// 6) provide verbose reasons for frontend to render to user
 	const validationPassed = true;
 	if (!validationPassed) {
-		return res.status(400).json({ error: "Failed to publish theme, validation failed." });
+		// todo: populate array with validation error details in future
+		return sendErrorResponse(res, 400, "Failed to publish theme, validation failed.", []);
 	}
 
 	// add the new creation to theme job queue for processing later
 	try {
-		await ThemeJobQueue.create({
-			user_id: userData.id,
-			theme_id,
+		const themeJobQueueEntry = await ThemeJobQueue.create({
+			userId: userData.id,
+			themeId: themeId,
 			name,
 			description,
 			action: "CREATE"
 		});
 
-		// todo: push files into minio bucket with theme_id for process queue job to pick up
+		// todo: push files into minio bucket with themeId for process queue job to pick up
 
-		res.status(201);
+		sendSuccessResponse(res, 201, themeJobQueueEntry, "Themed queued for publishing.");
 	} catch (error) {
 		Logger.error("Error publishing theme:", error);
-		res.status(500).json({ error: "Failed to publish theme, please try again." });
+		sendErrorResponse(res, 500, "Failed to publish theme, please try again.");
 	}
 };
 
@@ -117,19 +120,19 @@ const publishTheme = async (req: Request, res: Response) => {
  */
 const unpublishTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id } = req.params;
+	const { themeId } = req.params;
 
 	// check if the theme exists and is owned by the user
 	try {
 		const theme = await Theme.findOne({
 			where: {
-				id: theme_id,
+				id: themeId,
 			}
 		});
 
 		// if theme does not exist, cannot delete
 		if (!theme) {
-			return res.status(404).json({ error: "Failed to unpublish theme, the theme does not exist." });
+			return sendErrorResponse(res, 404, "Failed to unpublish theme, the theme does not exist.");
 		}
 
 		// if theme exist and user is admin, can delete
@@ -140,20 +143,20 @@ const unpublishTheme = async (req: Request, res: Response) => {
 
 		// todo: review how to handle unpublishing of themes, authors should not be allowed to delete themes anytime
 		// as there may be existing projects using their themes - perhaps separately have a support system for such action
-		return res.status(400).json({ error: "Feature not allowed." });
+		return sendErrorResponse(res, 400, "Feature not available yet.");
 
 		// if theme exist but user is not the theme author, cannot delete
-		// if (theme.dataValues.user_id != req.session.userId) {
-		// 	return res.status(403).json({ error: "Failed to unpublish theme, you are not the theme author." });
+		// if (theme.dataValues.userId != req.session.userId) {
+		// sendErrorResponse(res, 403, "Failed to unpublish theme, you are not the theme author.");
 		// }
 
 		// delete the theme
 		// await theme.destroy();
 
-		// res.status(200);
+		// sendSuccessResponse(res, 200, theme, "Theme queued for unpublishing.");
 	} catch (error) {
 		Logger.error("Error unpublishing theme:", error);
-		res.status(500).json({ error: "Failed to unpublish theme, please try again." });
+		sendErrorResponse(res, 500, "Failed to unpublish theme, please try again.");
 	}
 };
 

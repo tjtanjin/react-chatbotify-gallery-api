@@ -35,7 +35,7 @@ const fetchTokensWithCode = async (sessionId: string, key: string, provider: str
 		// save access token to Redis
 		await redisEphemeralClient.set(
 			`${process.env.USER_TOKEN_PREFIX as string}:${sessionId}`,
-			encrypt(tokenResponse.access_token),
+			encrypt(tokenResponse.accessToken),
 			{ EX: 27900 }
 		);
 	} catch (error) {
@@ -122,7 +122,7 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 			// if user exist, check if the provider is newly linked
 			const linkedAuthProvider = await LinkedAuthProvider.findOne({
 				where: {
-					user_id: existingUser.dataValues.id,
+					userId: existingUser.dataValues.id,
 					provider: userProviderData.provider
 				}
 			});
@@ -130,8 +130,8 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 			// if the provider with user doesn"t exist, add a new entry in LinkedAuthProvider
 			if (!linkedAuthProvider) {
 				await LinkedAuthProvider.create({
-					provider_user_id: userProviderData.provider_user_id,
-					user_id: existingUser.dataValues.id,
+					providerUserId: userProviderData.providerUserId,
+					userId: existingUser.dataValues.id,
 					provider: userProviderData.provider,
 				});
 			}
@@ -146,8 +146,8 @@ const getOrCreateUser = async (userProviderData: UserProviderData): Promise<User
 
 		// Add mapping in the LinkedAuthProvider table
 		await LinkedAuthProvider.create({
-			provider_user_id: userProviderData.provider_user_id,
-			user_id: newUser.dataValues.id,
+			providerUserId: userProviderData.providerUserId,
+			userId: newUser.dataValues.id,
 			provider: userProviderData.provider
 		});
 
@@ -171,15 +171,15 @@ const saveUserTokens = async (sessionId: string, userId: string, tokenResponse: 
 		// save access token to Redis
 		await redisEphemeralClient.set(
 			`${process.env.USER_TOKEN_PREFIX as string}:${sessionId}`,
-			encrypt(tokenResponse.access_token),
+			encrypt(tokenResponse.accessToken),
 			{ EX: 27900 }
 		);
 
-		// store refresh token into MySQL (upsert to overwrite if user_id exists)
+		// store refresh token into MySQL (upsert to overwrite userId exists)
 		await UserRefreshToken.upsert({
-			user_id: userId,
-			refresh_token: encrypt(tokenResponse.refresh_token),
-			expiry_date: tokenResponse.refresh_token_expiry
+			userId: userId,
+			refreshToken: encrypt(tokenResponse.refreshToken),
+			expiryDate: tokenResponse.refreshTokenExpiry
 		});
 
 		return true;
@@ -211,7 +211,7 @@ const getUserProviderDataFromProvider = async (
 ) => {
 	if (!accessToken) {
 		const tokenResponse = await refreshProviderTokens(sessionId, userId, provider);
-		accessToken = tokenResponse ? tokenResponse.access_token : null;
+		accessToken = tokenResponse ? tokenResponse.accessToken : null;
 	}
 
 	// if access token is null even after trying to refresh access token, get user to relogin
@@ -245,8 +245,8 @@ const refreshProviderTokens = async (sessionId: string, userId: string | null, p
 		// get refresh token from database
 		const refreshTokenRecord = await UserRefreshToken.findOne({
 			where: {
-				user_id: userId,
-				expiry_date: {
+				userId: userId,
+				expiryDate: {
 					[Op.gt]: new Date()  // Ensure the token has not expired
 				}
 			}
@@ -258,13 +258,13 @@ const refreshProviderTokens = async (sessionId: string, userId: string | null, p
 		}
 
 		// check token expiry and if expired, return null
-		const refreshTokenExpired = new Date(refreshTokenRecord.dataValues.expiry_date) <= new Date();
+		const refreshTokenExpired = new Date(refreshTokenRecord.dataValues.expiryDate) <= new Date();
 		if (refreshTokenExpired) {
 			return null;
 		}
 
 		// decrypt and get refresh token
-		const refreshToken = decrypt(refreshTokenRecord.dataValues.refresh_token);
+		const refreshToken = decrypt(refreshTokenRecord.dataValues.refreshToken);
 
 		// get new access token
 		let tokenResponse = null;

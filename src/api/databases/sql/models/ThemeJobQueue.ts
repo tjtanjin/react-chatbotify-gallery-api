@@ -29,13 +29,14 @@ ThemeJobQueue.init({
 		allowNull: false
 	},
 	// date of job creation
-	created_at: {
+	createdAt: {
 		type: DataTypes.DATE,
-		defaultValue: sequelize.literal("NOW()")
+		defaultValue: sequelize.literal("NOW()"),
+		field: "created_at"
 	}
 }, {
 	sequelize,
-	modelName: "ThemeJob",
+	modelName: "ThemeJobQueue",
 	timestamps: false
 });
 

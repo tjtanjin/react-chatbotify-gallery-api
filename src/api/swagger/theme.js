@@ -1,38 +1,28 @@
 const themePaths = {
 	"/api/v1/themes/": {
 		"get": {
-			"tags": [
-				"Themes Module"
-			],
+			"tags": ["Themes Module"],
 			"summary": "Retrieves a list of themes.",
-			"description": "Fetches a paginated list of themes with optional search query.",
+			"description": "Fetches a paginated list of themes with an optional search query.",
 			"parameters": [
 				{
 					"in": "query",
 					"name": "pageSize",
-					"schema": {
-						"type": "integer",
-						"default": 30
-					},
+					"schema": { "type": "integer", "default": 30 },
 					"required": false,
 					"description": "The number of themes to retrieve per page."
 				},
 				{
 					"in": "query",
 					"name": "pageNum",
-					"schema": {
-						"type": "integer",
-						"default": 1
-					},
+					"schema": { "type": "integer", "default": 1 },
 					"required": false,
 					"description": "The page number to retrieve."
 				},
 				{
 					"in": "query",
 					"name": "searchQuery",
-					"schema": {
-						"type": "string"
-					},
+					"schema": { "type": "string" },
 					"required": false,
 					"description": "A search query to filter themes by name or description."
 				}
@@ -42,40 +32,22 @@ const themePaths = {
 					"description": "A list of themes retrieved successfully.",
 					"content": {
 						"application/json": {
-							"schema": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"properties": {
-										"name": {
-											"type": "string",
-											"description": "The name of the theme."
-										},
-										"description": {
-											"type": "string",
-											"description": "A brief description of the theme."
-										},
-										"author": {
-											"type": "string",
-											"description": "The author of the theme."
-										},
-										"github": {
-											"type": "string",
-											"description": "The GitHub repository link for the theme."
-										},
-										"tags": {
-											"type": "array",
-											"items": {
-												"type": "string"
-											},
-											"description": "Tags associated with the theme."
-										},
-										"version": {
-											"type": "string",
-											"description": "The current version of the theme."
-										}
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": true,
+								"message": "Themes fetched successfully.",
+								"data": [
+									{
+										"id": "terminal",
+										"name": "Terminal",
+										"description": "For the geeks!",
+										"favoritesCount": "10",
+										"createdAt": "2024-08-07T18:43:21.000Z",
+										"updatedAt": "2024-08-07T18:43:21.000Z",
+										"userId": null
 									}
-								}
+								],
+								"errors": []
 							}
 						}
 					}
@@ -84,14 +56,12 @@ const themePaths = {
 					"description": "Internal server error occurred while fetching themes.",
 					"content": {
 						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message"
-									}
-								}
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to fetch themes.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -101,18 +71,14 @@ const themePaths = {
 	},
 	"/api/v1/themes/versions": {
 		"get": {
-			"tags": [
-				"Themes Module"
-			],
+			"tags": ["Themes Module"],
 			"summary": "Retrieves theme versions.",
 			"description": "Fetches all published versions for a specific theme.",
 			"parameters": [
 				{
 					"in": "query",
 					"name": "themeId",
-					"schema": {
-						"type": "string"
-					},
+					"schema": { "type": "string" },
 					"required": true,
 					"description": "The ID of the theme for which versions are to be retrieved."
 				}
@@ -122,30 +88,19 @@ const themePaths = {
 					"description": "A list of theme versions retrieved successfully.",
 					"content": {
 						"application/json": {
-							"schema": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"properties": {
-										"id": {
-											"type": "string",
-											"description": "The unique identifier for this theme version."
-										},
-										"theme_id": {
-											"type": "string",
-											"description": "The ID of the theme this version belongs to."
-										},
-										"version": {
-											"type": "string",
-											"description": "The version number of the theme."
-										},
-										"created_at": {
-											"type": "string",
-											"format": "date-time",
-											"description": "The date when this version was released."
-										}
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": true,
+								"message": "Theme versions fetched successfully.",
+								"data": [
+									{
+										"id": "4019665a-c621-4a7b-ba8d-88572f72b5bc",
+										"themeId": "terminal",
+										"version": "1.0.0",
+										"createdAt": "2024-08-07T18:43:21.000Z"
 									}
-								}
+								],
+								"errors": []
 							}
 						}
 					}
@@ -154,14 +109,12 @@ const themePaths = {
 					"description": "Internal server error occurred while fetching theme versions.",
 					"content": {
 						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message"
-									}
-								}
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to fetch theme versions.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -171,9 +124,7 @@ const themePaths = {
 	},
 	"/api/v1/themes/publish": {
 		"post": {
-			"tags": [
-				"Themes Module"
-			],
+			"tags": ["Themes Module"],
 			"summary": "Publishes a new theme.",
 			"description": "Publishes a new theme or updates an existing one. Handles versioning and validation.",
 			"requestBody": {
@@ -204,7 +155,7 @@ const themePaths = {
 							"schema": {
 								"type": "object",
 								"properties": {
-									"theme_id": {
+									"themeId": {
 										"type": "string",
 										"description": "The ID of the theme being published."
 									},
@@ -224,53 +175,52 @@ const themePaths = {
 							}
 						}
 					}
+				}
+			},
+			"responses": {
+				"201": {
+					"description": "Theme published successfully.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": true,
+								"message": "Theme queued for publishing.",
+								"data": {
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
+									"version": "1.1.0"
+								},
+								"errors": []
+							}
+						}
+					}
 				},
-				"responses": {
-					"201": {
-						"description": "Theme published successfully.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"message": {
-											"type": "string",
-											"description": "Success message."
-										}
-									}
-								}
+				"400": {
+					"description": "Bad request due to validation failure.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to publish theme, validation failed.",
+								"data": null,
+								"errors": []
 							}
 						}
-					},
-					"400": {
-						"description": "Bad request due to validation failure.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"error": {
-											"type": "string",
-											"description": "Validation error message."
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal server error occurred while publishing the theme.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"error": {
-											"type": "string",
-											"description": "Error message"
-										}
-									}
-								}
+					}
+				},
+				"500": {
+					"description": "Internal server error occurred while publishing the theme.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to publish theme, please try again.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -280,18 +230,14 @@ const themePaths = {
 	},
 	"/api/v1/themes/unpublish": {
 		"delete": {
-			"tags": [
-				"Themes Module"
-			],
+			"tags": ["Themes Module"],
 			"summary": "Unpublishes an existing theme.",
 			"description": "Removes a theme from publication.",
 			"parameters": [
 				{
 					"in": "query",
-					"name": "theme_id",
-					"schema": {
-						"type": "string"
-					},
+					"name": "themeId",
+					"schema": { "type": "string" },
 					"required": true,
 					"description": "The ID of the theme to unpublish."
 				}
@@ -301,46 +247,59 @@ const themePaths = {
 					"description": "Theme unpublished successfully.",
 					"content": {
 						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"message": {
-										"type": "string",
-										"description": "Success message."
-									}
-								}
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": true,
+								"message": "Theme queued for unpublishing.",
+								"data": {
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
+									"version": "1.1.0"
+								},
+								"errors": []
 							}
 						}
-					},
-					"400": {
-						"description": "Feature not allowed or bad request.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"error": {
-											"type": "string",
-											"description": "Error message describing why the operation failed."
-										}
-									}
-								}
+					}
+				},
+				"400": {
+					"description": "Feature not allowed or bad request.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Feature not available yet.",
+								"data": null,
+								"errors": []
 							}
 						}
-					},
-					"500": {
-						"description": "Internal server error occurred while unpublishing the theme.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"error": {
-											"type": "string",
-											"description": "Error message"
-										}
-									}
-								}
+					}
+				},
+				"404": {
+					"description": "Theme not found.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to unpublish theme, the theme does not exist.",
+								"data": null,
+								"errors": []
+							}
+						}
+					}
+				},
+				"500": {
+					"description": "Internal server error occurred while unpublishing the theme.",
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/ApiResult" },
+							"example": {
+								"success": false,
+								"message": "Failed to unpublish theme, please try again.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -348,6 +307,6 @@ const themePaths = {
 			}
 		}
 	}
-}
+};
 
 export default themePaths;

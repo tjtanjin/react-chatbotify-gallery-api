@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import FavoriteTheme from "../databases/sql/models/FavoriteTheme";
 import Theme from "../databases/sql/models/Theme";
 import { sequelize } from "../databases/sql/sql";
-import { checkIsAdminUser } from "../services/authorization";
 import Logger from "../logger";
+import { checkIsAdminUser } from "../services/authorization";
+import { sendErrorResponse, sendSuccessResponse } from "../utils/responseUtils";
 
 /**
  * Retrieves the user profile information (i.e. user data).
@@ -20,11 +21,11 @@ const getUserProfile = async (req: Request, res: Response) => {
 
 	// if user id matches or user is admin, can retrieve user data
 	if (!queryUserId || queryUserId === sessionUserId || checkIsAdminUser(userData)) {
-		return res.json(userData);
+		return sendSuccessResponse(res, 200, userData, "User data fetched successfully.");
 	}
 
 	// all other cases unauthorized
-	return res.status(403).json({ error: "Unauthorized access" });
+	sendErrorResponse(res, 403, "Unauthorized access.");
 };
 
 /**
@@ -45,16 +46,16 @@ const getUserThemes = async (req: Request, res: Response) => {
 		try {
 			const themes = await Theme.findAll({
 				where: {
-					user_id: userData.id
+					userId: userData.id
 				}
 			});
-			return res.json(themes);
+			return sendSuccessResponse(res, 200, themes, "User themes fetched successfully.");
 		} catch {
 		}
 	}
 
 	// all other cases unauthorized
-	return res.status(403).json({ error: "Unauthorized access" });
+	sendErrorResponse(res, 403, "Unauthorized access.");
 };
 
 /**
@@ -75,17 +76,17 @@ const getUserFavoriteThemes = async (req: Request, res: Response) => {
 		try {
 			const userFavoriteThemes = await FavoriteTheme.findAll({
 				where: {
-					user_id: userData.id
+					userId: userData.id
 				},
 				include: [Theme]
 			});
-			res.json(userFavoriteThemes);
+			return sendSuccessResponse(res, 200, userFavoriteThemes, "User favorite themes fetched successfully.");
 		} catch {
 		}
 	}
 
 	// all other cases unauthorized
-	return res.status(403).json({ error: "Unauthorized access" });
+	sendErrorResponse(res, 403, "Unauthorized access.");
 };
 
 /**
@@ -98,43 +99,43 @@ const getUserFavoriteThemes = async (req: Request, res: Response) => {
  */
 const addUserFavoriteTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id } = req.body;
+	const { themeId } = req.body;
 
 	try {
 		await sequelize.transaction(async (transaction) => {
 			// check if the theme exists
-			const theme = await Theme.findByPk(theme_id, { transaction });
+			const theme = await Theme.findByPk(themeId, { transaction });
 			if (!theme) {
-				return res.status(404).json({ error: "Theme not found." });
+				return sendErrorResponse(res, 404, "Theme not found.");
 			}
 
 			// check if theme already favorited
 			const existingFavorite = await FavoriteTheme.findOne({
 				where: {
-					user_id: userData.id,
-					id: theme_id
+					userId: userData.id,
+					id: themeId
 				},
 				transaction
 			});
 
 			if (existingFavorite) {
-				return res.status(400).json({ error: "Theme already favorited." });
+				return sendErrorResponse(res, 400, "Theme already favorited.");
 			}
 
 			// add favorite theme
 			await FavoriteTheme.create({
-				user_id: userData.id,
-				id: theme_id
+				userId: userData.id,
+				id: themeId
 			}, { transaction });
 
 			// increment the favorites count in the theme table
-			await theme.increment("favorites_count", { by: 1, transaction });
+			await theme.increment("favoritesCount", { by: 1, transaction });
 		});
 
-		res.status(201);
+		sendSuccessResponse(res, 201, {}, "Added theme to favorites successfully.");
 	} catch (error) {
 		Logger.error("Error adding favorite theme:", error);
-		res.status(500).json({ error: "Failed to add favorite theme." });
+		sendErrorResponse(res, 500, "Failed to add favorite theme.");
 	}
 };
 
@@ -148,37 +149,37 @@ const addUserFavoriteTheme = async (req: Request, res: Response) => {
  */
 const removeUserFavoriteTheme = async (req: Request, res: Response) => {
 	const userData = req.userData;
-	const { theme_id } = req.params;
+	const { themeId } = req.params;
 
 	try {
 		await sequelize.transaction(async (transaction) => {
 			// check if theme is favorited
 			const existingFavorite = await FavoriteTheme.findOne({
 				where: {
-					user_id: userData.id,
-					id: theme_id
+					userId: userData.id,
+					id: themeId
 				},
 				transaction
 			});
 
 			if (!existingFavorite) {
-				return res.status(404).json({ error: "Favorite theme not found" });
+				return sendErrorResponse(res, 404, "Favorite theme not found.");
 			}
 
 			// remove favorite theme
 			await existingFavorite.destroy({ transaction });
 
 			// decrement the favorites count in the theme table
-			const theme = await Theme.findByPk(theme_id, { transaction });
+			const theme = await Theme.findByPk(themeId, { transaction });
 			if (theme) {
-				await theme.decrement("favorites_count", { by: 1, transaction });
+				await theme.decrement("favoritesCount", { by: 1, transaction });
 			}
 		});
 
-		res.status(200);
+		sendSuccessResponse(res, 200, {}, "Removed theme from favorites successfully.");
 	} catch (error) {
 		Logger.error("Error removing favorite theme:", error);
-		res.status(500).json({ error: "Failed to remove favorite theme" });
+		sendErrorResponse(res, 500, "Failed to remove favorite theme.");
 	}
 };
 

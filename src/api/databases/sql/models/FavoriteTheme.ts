@@ -11,7 +11,7 @@ class FavoriteTheme extends Model { }
 FavoriteTheme.init({}, { sequelize, modelName: "FavoriteTheme" });
 
 // contains only user id and theme id to associate user favorites
-FavoriteTheme.belongsTo(User, { foreignKey: "user_id" });
-FavoriteTheme.belongsTo(Theme, { foreignKey: "theme_id" });
+FavoriteTheme.belongsTo(User, { foreignKey: "userId" });
+FavoriteTheme.belongsTo(Theme, { foreignKey: "themeId" });
 
 export default FavoriteTheme;

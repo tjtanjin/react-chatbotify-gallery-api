@@ -23,53 +23,25 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"id": {
-										"type": "string",
-										"description": "The user's unique ID."
-									},
-									"role": {
-										"type": "string",
-										"description": "The user's role."
-									},
-									"name": {
-										"type": "string",
-										"description": "The user's name."
-									},
-									"email": {
-										"type": "string",
-										"description": "The user's email address."
-									},
-									"handle": {
-										"type": "string",
-										"description": "The user's handle or username on the provider platform."
-									},
-									"avatar_url": {
-										"type": "string",
-										"description": "The URL of the user's avatar image."
-									},
-									"status": {
-										"type": "string",
-										"description": "The user's status, if any."
-									},
-									"location": {
-										"type": "string",
-										"description": "The user's location."
-									},
-									"profile_url": {
-										"type": "string",
-										"description": "The URL of the user's profile."
-									},
-									"provider": {
-										"type": "string",
-										"description": "The OAuth provider used (e.g., GitHub)."
-									},
-									"provider_user_id": {
-										"type": "string",
-										"description": "The user's ID as provided by the OAuth provider."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": true,
+								"message": "User data fetched successfully.",
+								"data": {
+									"id": "user123",
+									"role": "admin",
+									"name": "John Doe",
+									"email": "john@example.com",
+									"handle": "johndoe",
+									"avatarUrl": "http://example.com/avatar.jpg",
+									"status": "active",
+									"location": "USA",
+									"profileUrl": "http://example.com/profile/johndoe",
+									"provider": "github",
+									"providerUserId": "github123"
+								},
+								"errors": []
 							}
 						}
 					}
@@ -79,13 +51,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating unauthorized access."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Unauthorized access.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -117,28 +89,20 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"properties": {
-										"id": {
-											"type": "string",
-											"description": "The unique ID of the theme."
-										},
-										"name": {
-											"type": "string",
-											"description": "The name of the theme."
-										},
-										"description": {
-											"type": "string",
-											"description": "A brief description of the theme."
-										},
-										"version": {
-											"type": "string",
-											"description": "The current version of the theme."
-										}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": true,
+								"message": "User themes fetched successfully.",
+								"data": [
+									{
+										"id": "terminal",
+										"name": "Terminal",
+										"description": "For the geeks!",
+										"version": "1.0.0"
 									}
-								}
+								],
+								"errors": []
 							}
 						}
 					}
@@ -148,13 +112,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating unauthorized access."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Unauthorized access.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -186,28 +150,20 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"properties": {
-										"id": {
-											"type": "string",
-											"description": "The unique ID of the favorited theme."
-										},
-										"name": {
-											"type": "string",
-											"description": "The name of the favorited theme."
-										},
-										"description": {
-											"type": "string",
-											"description": "A brief description of the favorited theme."
-										},
-										"version": {
-											"type": "string",
-											"description": "The current version of the favorited theme."
-										}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": true,
+								"message": "User favorite themes fetched successfully.",
+								"data": [
+									{
+										"id": "theme123",
+										"name": "Dark Mode",
+										"description": "A sleek dark theme.",
+										"version": "1.0.0"
 									}
-								}
+								],
+								"errors": []
 							}
 						}
 					}
@@ -217,13 +173,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating unauthorized access."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Unauthorized access.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -243,7 +199,7 @@ const userPaths = {
 						"schema": {
 							"type": "object",
 							"properties": {
-								"theme_id": {
+								"themeId": {
 									"type": "string",
 									"description": "The ID of the theme to be added to favorites."
 								}
@@ -258,13 +214,18 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"message": {
-										"type": "string",
-										"description": "Success message."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": true,
+								"message": "Added theme to favorites successfully.",
+								"data": {
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
+									"version": "1.0.0"
+								},
+								"errors": []
 							}
 						}
 					}
@@ -274,13 +235,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating the theme was not found."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Theme not found.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -290,13 +251,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating the theme is already in the user's favorites."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Theme already favorited.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -306,13 +267,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating a server error occurred."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Failed to add favorite theme.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -328,7 +289,7 @@ const userPaths = {
 			"parameters": [
 				{
 					"in": "query",
-					"name": "theme_id",
+					"name": "themeId",
 					"schema": {
 						"type": "string"
 					},
@@ -342,13 +303,18 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"message": {
-										"type": "string",
-										"description": "Success message."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": true,
+								"message": "Removed theme from favorites successfully.",
+								"data": {
+									"id": "terminal",
+									"name": "Terminal",
+									"description": "For the geeks!",
+									"version": "1.0.0"
+								},
+								"errors": []
 							}
 						}
 					}
@@ -358,13 +324,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating the favorite theme was not found."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Favorite theme not found.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -374,13 +340,13 @@ const userPaths = {
 					"content": {
 						"application/json": {
 							"schema": {
-								"type": "object",
-								"properties": {
-									"error": {
-										"type": "string",
-										"description": "Error message indicating a server error occurred."
-									}
-								}
+								"$ref": "#/components/schemas/ApiResult"
+							},
+							"example": {
+								"success": false,
+								"message": "Failed to remove favorite theme.",
+								"data": null,
+								"errors": []
 							}
 						}
 					}
@@ -388,6 +354,6 @@ const userPaths = {
 			}
 		}
 	}
-}
+};
 
 export default userPaths;

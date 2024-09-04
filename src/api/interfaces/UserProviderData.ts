@@ -3,12 +3,12 @@ interface UserProviderData {
 	name: string;
 	email: string;
 	handle: string;
-	avatar_url: string;
+	avatarUrl: string;
 	status: string;
 	location: string;
-	profile_url: string;
+	profileUrl: string;
 	provider: string;
-	provider_user_id: string;
+	providerUserId: string;
 }
 
 export {
