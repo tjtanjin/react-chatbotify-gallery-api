@@ -3,7 +3,7 @@ interface ApiResult {
 	success: boolean;
 	message: string;
 	errors?: string[];
-	data: object | unknown[] | null;
+	data?: object
 }
 
 export {
