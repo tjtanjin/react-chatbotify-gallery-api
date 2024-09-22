@@ -8,7 +8,8 @@ Plugin.init(
   {
     // unique identifier for the plugins
     id: {
-      type: DataTypes.UUIDV4,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     // name of the plugin, a more human-readable friendly identifier but may not be unique
