@@ -8,8 +8,7 @@ Plugin.init(
   {
     // unique identifier for the plugins
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: DataTypes.STRING,
       primaryKey: true,
     },
     // name of the plugin, a more human-readable friendly identifier but may not be unique
@@ -37,13 +36,13 @@ Plugin.init(
     // date when the plugin is created
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('NOW()'),
+      defaultValue: DataTypes.NOW,
       field: 'created_at',
     },
     // date when the plugin was last updated
     updatedAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('NOW()'),
+      defaultValue: DataTypes.NOW,
       field: 'updated_at',
     },
   },
