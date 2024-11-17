@@ -141,6 +141,17 @@ const deleteFile = async (
   }
 };
 
+/**
+ * creates a presigned url for files.
+ *
+ * @param bucketName name of bucket
+ * @param objectName name of file
+ * @param expiryDate? optional expiration date
+ */
+const createPresignedURL= (bucketName: string , objectName: string, expiryDate?: number) => {
 
+  const url = minioClient.presignedUrl('GET',bucketName, objectName, expiryDate)
+  return url;
+}
 
-export { deleteFile, getFile, setUpMinioBucket, uploadFile, uploadBuffer };
+export { deleteFile, getFile, setUpMinioBucket, uploadFile, uploadBuffer, createPresignedURL };

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPlugins, publishPlugin } from '../controllers/pluginController';
+import { editPlugin, getPlugins, publishPlugin } from '../controllers/pluginController';
 import checkUserSession from '../middleware/userSessionMiddleware';
 import multer from 'multer';
 import { getFileExtension } from './themeRoutes';
@@ -35,5 +35,10 @@ router.post(
   upload.fields([{ name: 'imgUrl', maxCount: 1 }]),
   publishPlugin,
 );
+router.patch("/",
+
+upload.fields([{ name: 'imgUrl', maxCount: 1 }]),
+editPlugin
+)
 
 export default router;
