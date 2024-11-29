@@ -22,8 +22,8 @@ const getThemes = async (req: Request, res: Response) => {
 	const { pageSize = 30, pageNum = 1, searchQuery = "" } = req.query;
 
 	// construct clause for searching themes
-	const limit = parseInt(pageSize as string, 30);
-	const offset = (parseInt(pageNum as string, 30) - 1) * limit;
+	const limit = parseInt(pageSize as string) || 30;
+	const offset = ((parseInt(pageNum as string) || 1) - 1) * limit;
 	const whereClause = searchQuery ? {
 		[Op.or]: [
 			{ name: { [Op.like]: `%${searchQuery}%` } },
