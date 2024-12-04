@@ -1,6 +1,8 @@
 import { BucketItem, Client, ClientOptions } from 'minio';
 import Logger from '../logger';
 
+// define MINIO domain
+export const MINIO_URL = process.env.MINIO_URL;
 // define minio client options based on parameters
 const minioClientOptions: ClientOptions = {
   endPoint: 'minio',
@@ -148,10 +150,25 @@ const deleteFile = async (
  * @param objectName name of file
  * @param expiryDate? optional expiration date
  */
-const createPresignedURL= (bucketName: string , objectName: string, expiryDate?: number) => {
-
-  const url = minioClient.presignedUrl('GET',bucketName, objectName, expiryDate)
+const createPresignedURL = (
+  bucketName: string,
+  objectName: string,
+  expiryDate?: number,
+) => {
+  const url = minioClient.presignedUrl(
+    'GET',
+    bucketName,
+    objectName,
+    expiryDate,
+  );
   return url;
-}
+};
 
-export { deleteFile, getFile, setUpMinioBucket, uploadFile, uploadBuffer, createPresignedURL };
+export {
+  deleteFile,
+  getFile,
+  setUpMinioBucket,
+  uploadFile,
+  uploadBuffer,
+  createPresignedURL,
+};

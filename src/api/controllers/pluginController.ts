@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { sendErrorResponse, sendSuccessResponse } from '../utils/responseUtils';
 import Logger from '../logger';
 import {
+  MINIO_URL,
   createPresignedURL,
   getFile,
   uploadBuffer,
@@ -21,8 +22,8 @@ import * as crypto from 'crypto';
  */
 const getPlugins = async (req: Request, res: Response) => {
   const { pageSize = 30, pageNum = 1, searchQuery = '' } = req.query;
-  const limit = parseInt(pageSize as string, 30);
-  const offset = (parseInt(pageNum as string, 30) - 1) * limit;
+  const limit = parseInt(pageSize as string) || 30;
+  const offset = ((parseInt(pageNum as string) || 30) - 1) * limit;
   const whereClause = searchQuery
     ? {
         [Op.or]: [
@@ -33,28 +34,12 @@ const getPlugins = async (req: Request, res: Response) => {
     : {};
 
   try {
-    const foundPlugins = await Plugin.findAll({
+    const plugins = await Plugin.findAll({
       where: whereClause,
       offset,
       limit,
       raw: true,
     });
-
-    const plugins = await Promise.all(
-      foundPlugins.map(async (plugin) => {
-        const imageURL = (plugin as any).imageURL as string;
-        if (imageURL.includes('/plugins-images/')) {
-          const imageName = imageURL.split('/plugins-images/')[1];
-          const url = await createPresignedURL('plugins-images', imageName);
-          return {
-            ...plugin,
-            imageURL: url,
-          };
-        } else {
-          return plugin;
-        }
-      }),
-    );
 
     return sendSuccessResponse(
       res,
@@ -78,7 +63,7 @@ const editPlugin = async (req: Request, res: Response) => {
   try {
     const plugin = await Plugin.findOne({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -101,11 +86,7 @@ const publishPlugin = async (req: Request, res: Response) => {
     fileName + crypto.randomBytes(20).toString('hex') + '.' + extension;
   try {
     await uploadBuffer('plugins-images', imgName, imgFile.buffer);
-    const uploadedFile = await getFile('plugins-images', imgName);
-    let imageURL = '';
-    if (uploadedFile) {
-      imageURL = 'localhost:9000' + '/plugins-images/' + uploadedFile.name!;
-    }
+    const imageURL = `${MINIO_URL}/plugins-images/${imgName}`;
 
     const plugin = await Plugin.create({
       name: name,

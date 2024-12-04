@@ -37,7 +37,7 @@ router.get('/', getPlugins);
 // TODO: publish a plugin
 router.post(
   '/publish',
-  //checkUserSession,
+  checkUserSession,
   upload.fields([{ name: 'imgUrl', maxCount: 1 }]),
   publishPlugin,
 );
