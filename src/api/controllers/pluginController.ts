@@ -11,6 +11,7 @@ import {
   uploadFile,
 } from '../services/minioService';
 import * as crypto from 'crypto';
+import { getPluginsService } from '../services/plugins';
 
 /**
  * Handles fetching of plugins.
@@ -24,21 +25,12 @@ const getPlugins = async (req: Request, res: Response) => {
   const { pageSize = 30, pageNum = 1, searchQuery = '' } = req.query;
   const limit = parseInt(pageSize as string) || 30;
   const offset = ((parseInt(pageNum as string) || 30) - 1) * limit;
-  const whereClause = searchQuery
-    ? {
-        [Op.or]: [
-          { name: { [Op.like]: `%${searchQuery}%` } },
-          { description: { [Op.like]: `%${searchQuery}%` } },
-        ],
-      }
-    : {};
 
   try {
-    const plugins = await Plugin.findAll({
-      where: whereClause,
-      offset,
+    const plugins = await getPluginsService({
+      searchQuery: searchQuery as string,
       limit,
-      raw: true,
+      offset,
     });
 
     return sendSuccessResponse(
