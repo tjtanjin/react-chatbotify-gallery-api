@@ -13,7 +13,6 @@ const storage = multer.memoryStorage();
 
 // file upload middleware with file type filter and limits
 const upload = multer({
-  storage: storage,
   // todo: review this limit
   limits: {
     fileSize: 5 * 1024 * 1024, // default to 5mb
@@ -29,6 +28,7 @@ const upload = multer({
       cb(new Error('Invalid file extension'));
     }
   },
+  storage,
 });
 
 // helper function to get file extension
