@@ -111,7 +111,7 @@ const publishPlugin = async (req: Request, res: Response) => {
       name: name,
       description: description,
       imageURL,
-      userId: '79c302e1-033b-4567-b7b5-33470f87f88e',
+      userId: userData.id,
       id: id,
     });
 
