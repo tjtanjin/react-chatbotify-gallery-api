@@ -65,7 +65,7 @@ app.use(
           ? process.env.FRONTEND_WEBSITE_DOMAIN
           : undefined,
       // expire after 3 months (milliseconds)
-      maxAge: 7776000000,
+      maxAge: 1000 * 60 * 60 * 60 * 24 * 30 * 3,
     },
   }),
 );

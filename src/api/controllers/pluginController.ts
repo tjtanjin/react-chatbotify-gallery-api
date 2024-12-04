@@ -3,7 +3,12 @@ import Plugin from '../databases/sql/models/Plugin';
 import { Op } from 'sequelize';
 import { sendErrorResponse, sendSuccessResponse } from '../utils/responseUtils';
 import Logger from '../logger';
-import { createPresignedURL, getFile, uploadBuffer, uploadFile } from '../services/minioService';
+import {
+  createPresignedURL,
+  getFile,
+  uploadBuffer,
+  uploadFile,
+} from '../services/minioService';
 import * as crypto from 'crypto';
 
 /**
@@ -28,30 +33,28 @@ const getPlugins = async (req: Request, res: Response) => {
     : {};
 
   try {
-    const foundPlugins =await Plugin.findAll({
+    const foundPlugins = await Plugin.findAll({
       where: whereClause,
       offset,
       limit,
-      raw: true
-    })
+      raw: true,
+    });
 
-    const plugins = await Promise.all(foundPlugins.map(async (plugin) => {
-     const imageURL =  (plugin as any).imageURL as string;
-     if(imageURL.includes('/plugins-images/')){
-
-       const imageName = imageURL.split("/plugins-images/")[1];
-       const url = await createPresignedURL('plugins-images', imageName)
-       return {
-         ...plugin,
-         imageURL: url
-        };
-      } else {
-        return plugin
-      }
-    }))
-
-    
-   
+    const plugins = await Promise.all(
+      foundPlugins.map(async (plugin) => {
+        const imageURL = (plugin as any).imageURL as string;
+        if (imageURL.includes('/plugins-images/')) {
+          const imageName = imageURL.split('/plugins-images/')[1];
+          const url = await createPresignedURL('plugins-images', imageName);
+          return {
+            ...plugin,
+            imageURL: url,
+          };
+        } else {
+          return plugin;
+        }
+      }),
+    );
 
     return sendSuccessResponse(
       res,
@@ -65,27 +68,27 @@ const getPlugins = async (req: Request, res: Response) => {
   }
 };
 
-const deletePlugin = async(req: Request , res: Response) => {
+//TODO: implement delete plugin
+const deletePlugin = async (req: Request, res: Response) => {};
 
-}
-
-const editPlugin =  async (req: Request, res: Response) => {
+//TODO: implement edit plugin
+const editPlugin = async (req: Request, res: Response) => {
   const userData = req.userData;
   const { name, description, id } = req.body;
-  try{
+  try {
     const plugin = await Plugin.findOne({
-      where:{
-        id: id
-      }
-    })
-    
+      where: {
+        id: id,
+      },
+    });
+
     sendSuccessResponse(res, 200, plugin || {}, 'Successful');
-  }
-  catch(e){
+  } catch (e) {
     sendErrorResponse(res, 500, 'Error', e as string[]);
   }
-}
+};
 
+//TODO: implement publishing a plugin
 const publishPlugin = async (req: Request, res: Response) => {
   const userData = req.userData;
   const { name, description, id } = req.body;
@@ -94,21 +97,22 @@ const publishPlugin = async (req: Request, res: Response) => {
   ][0];
 
   const [fileName, extension] = imgFile.originalname.split('.');
-  const imgName = fileName + crypto.randomBytes(20).toString('hex') + '.' + extension;
+  const imgName =
+    fileName + crypto.randomBytes(20).toString('hex') + '.' + extension;
   try {
     await uploadBuffer('plugins-images', imgName, imgFile.buffer);
     const uploadedFile = await getFile('plugins-images', imgName);
     let imageURL = '';
     if (uploadedFile) {
-      imageURL = "localhost:9000"+'/plugins-images/' + uploadedFile.name!;
+      imageURL = 'localhost:9000' + '/plugins-images/' + uploadedFile.name!;
     }
 
     const plugin = await Plugin.create({
       name: name,
       description: description,
       imageURL,
-      userId: "79c302e1-033b-4567-b7b5-33470f87f88e", 
-      id: id
+      userId: '79c302e1-033b-4567-b7b5-33470f87f88e',
+      id: id,
     });
 
     sendSuccessResponse(res, 200, plugin, 'Successful');
