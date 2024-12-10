@@ -1,12 +1,12 @@
 import express from 'express';
-import multer from 'multer';
 import {
-  getThemes,
-  getThemeVersions,
-  publishTheme,
-  unpublishTheme,
-} from '../controllers/themeController';
+  editPlugin,
+  getPlugins,
+  publishPlugin,
+} from '../controllers/pluginController';
 import checkUserSession from '../middleware/userSessionMiddleware';
+import multer from 'multer';
+import { getFileExtension } from './themeRoutes';
 
 // multer storage configuration
 const storage = multer.memoryStorage();
@@ -19,7 +19,7 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     // allow only these file extensions
-    const allowedExtensions = ['.css', '.json', '.png'];
+    const allowedExtensions = ['png'];
     const fileExtension = getFileExtension(file.originalname);
     // todo: can enforce file name together with extension as well
     if (allowedExtensions.includes(fileExtension)) {
@@ -30,35 +30,19 @@ const upload = multer({
   },
   storage,
 });
-
-// helper function to get file extension
-export function getFileExtension(filename: string) {
-  return filename
-    .slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2)
-    .toLowerCase();
-}
-
 const router = express.Router();
 
-// retrieves themes
-router.get('/', getThemes);
+router.get('/', getPlugins);
 
-// retrieves theme versions
-router.get('/versions', getThemeVersions);
-
-// publish theme
+// TODO: publish a plugin
 router.post(
   '/publish',
   checkUserSession,
-  upload.fields([
-    { name: 'styles', maxCount: 1 },
-    { name: 'options', maxCount: 1 },
-    { name: 'display', maxCount: 1 },
-  ]),
-  publishTheme,
+  upload.fields([{ name: 'imgUrl', maxCount: 1 }]),
+  publishPlugin,
 );
 
-// unpublish theme
-router.delete('/unpublish', checkUserSession, unpublishTheme);
+// TODO:  edit a plugin
+router.patch('/', upload.fields([{ name: 'imgUrl', maxCount: 1 }]), editPlugin);
 
 export default router;
